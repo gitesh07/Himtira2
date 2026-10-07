@@ -1,0 +1,954 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>HIMITRA – App demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Noto+Sans:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EAF0F3; --surf:#FFFFFF; --surf2:#F2F6F8; --ink:#12242D; --mut:#586A73; --line:#D8E1E6;
+  --blue:#2B6CB0; --sky:#2D9CDB; --red:#D64545; --sos:#E02F2F; --green:#2F9E63; --yellow:#EDAE1F;
+  --pri:#1D5C8E; --on-pri:#fff;
+  --map-land:#E3EBE5; --map-cont:#BFCEC4; --map-river:#7DB3D6; --map-road:#A3AFB4; --map-txt:#3E4F57; --map-pin:#12242D;
+  --amber-bg:#FFF3D6; --amber-ink:#6B4A00; --ok-bg:#E2F4EA; --ok-ink:#175C38; --bad-bg:#FBE4E2; --bad-ink:#8A1F1A;
+  --shadow:0 10px 30px rgba(10,30,40,.18);
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0B161B; --surf:#13232A; --surf2:#1A2E37; --ink:#E8F0F3; --mut:#94A8B0; --line:#25393F;
+    --blue:#5B9BE0; --sky:#52B4EA; --red:#F06666; --sos:#F04848; --green:#4CBF85; --yellow:#F3BD3F;
+    --pri:#5AA6E3; --on-pri:#08161D;
+    --map-land:#10212A; --map-cont:#1F3843; --map-river:#3F7EA6; --map-road:#4C6068; --map-txt:#A9BCC3; --map-pin:#E8F0F3;
+    --amber-bg:#3A2E0E; --amber-ink:#F6D77C; --ok-bg:#12352380; --ok-ink:#8EE0B4; --bad-bg:#40191A; --bad-ink:#F5A3A0;
+    --shadow:0 10px 30px rgba(0,0,0,.5);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0B161B; --surf:#13232A; --surf2:#1A2E37; --ink:#E8F0F3; --mut:#94A8B0; --line:#25393F;
+  --blue:#5B9BE0; --sky:#52B4EA; --red:#F06666; --sos:#F04848; --green:#4CBF85; --yellow:#F3BD3F;
+  --pri:#5AA6E3; --on-pri:#08161D;
+  --map-land:#10212A; --map-cont:#1F3843; --map-river:#3F7EA6; --map-road:#4C6068; --map-txt:#A9BCC3; --map-pin:#E8F0F3;
+  --amber-bg:#3A2E0E; --amber-ink:#F6D77C; --ok-bg:#12352380; --ok-ink:#8EE0B4; --bad-bg:#40191A; --bad-ink:#F5A3A0;
+  --shadow:0 10px 30px rgba(0,0,0,.5);
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:100%}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font:400 15px/1.5 'Noto Sans','Noto Sans Devanagari','Noto Sans Bengali',system-ui,-apple-system,'Segoe UI',sans-serif;min-height:100vh;overflow-x:hidden}
+h1,h2,h3,.disp{font-family:'Bricolage Grotesque','Noto Sans Devanagari','Noto Sans Bengali','Noto Sans',system-ui,sans-serif;font-weight:700;line-height:1.15}
+:lang(en) h1,:lang(en) h2,:lang(en) .disp{letter-spacing:-.015em}
+h1{font-size:clamp(30px,6vw,46px)} h2{font-size:22px} h3{font-size:17px}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--sky);outline-offset:2px;border-radius:8px}
+.ic{flex:none;display:block}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* header */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:var(--surf);border-bottom:1px solid var(--line)}
+.strip{display:flex;height:5px}.strip i{flex:1}
+.bar{display:flex;align-items:center;gap:10px 14px;flex-wrap:wrap;padding:8px 14px;max-width:1240px;margin:0 auto}
+.brand{display:flex;align-items:center;gap:8px;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:20px;color:var(--ink)}
+.brand svg{color:var(--pri)}
+.seg{display:flex;background:var(--surf2);border:1px solid var(--line);border-radius:14px;padding:3px;order:3;width:100%}
+.seg button{flex:1;padding:8px 10px;border-radius:11px;font-weight:600;font-size:14px;color:var(--mut);min-height:40px;display:flex;align-items:center;justify-content:center;gap:6px}
+.seg button[aria-pressed=true]{background:var(--ink);color:var(--bg)}
+.tools{margin-left:auto;display:flex;gap:8px;align-items:center}
+.pill-btn{display:flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surf);border-radius:999px;padding:0 12px;min-height:40px;font-weight:600;font-size:14px}
+.pill-btn[aria-pressed=true]{background:var(--amber-bg);color:var(--amber-ink);border-color:transparent}
+.lang{appearance:none;background:var(--surf);border:1px solid var(--line);border-radius:999px;padding:0 14px;min-height:40px;font-weight:600;cursor:pointer}
+@media(min-width:760px){.seg{order:0;width:auto;margin-left:12px}.seg button{padding:8px 16px}}
+
+/* shell */
+.shell{max-width:1240px;margin:0 auto;display:block}
+main{padding:16px 14px calc(110px + env(safe-area-inset-bottom,0px));min-width:0}
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--surf);border-top:1px solid var(--line);display:flex;padding:4px 6px calc(4px + env(safe-area-inset-bottom,0px))}
+.nv{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 2px 6px;font-size:12px;font-weight:500;color:var(--mut);position:relative;min-height:54px;border-radius:12px}
+.nv[aria-current=page]{color:var(--ink);font-weight:700}
+.nv[aria-current=page] .ic{color:var(--c)}
+.nv[aria-current=page]::before{content:"";position:absolute;top:-5px;left:24%;right:24%;height:4px;border-radius:0 0 4px 4px;background:var(--c)}
+@media(min-width:900px){
+  .shell{display:grid;grid-template-columns:210px minmax(0,1fr);gap:8px;align-items:start}
+  .nav{position:sticky;top:calc(env(safe-area-inset-top,0px) + 96px);flex-direction:column;border:0;background:none;padding:22px 0 0 14px;gap:4px;bottom:auto}
+  .nv{flex:none;flex-direction:row;gap:12px;padding:0 14px;font-size:15px;justify-content:flex-start;min-height:48px}
+  .nv[aria-current=page]{background:var(--surf);box-shadow:inset 0 0 0 1px var(--line)}
+  .nv[aria-current=page]::before{top:12px;bottom:12px;left:-1px;right:auto;width:4px;height:auto;border-radius:0 4px 4px 0}
+  main{padding:22px 22px 60px}
+}
+
+/* generic */
+.card{background:var(--surf);border:1px solid var(--line);border-radius:18px;padding:16px}
+.row{display:flex;align-items:center;gap:10px}.sp{flex:1}
+.mut{color:var(--mut)}.sm{font-size:13px}.b{font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surf);border-radius:999px;padding:0 14px;min-height:40px;font-weight:500}
+button.chip[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.tag{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;border-radius:8px;padding:3px 8px;background:var(--surf2);color:var(--mut)}
+.tag.ok{background:var(--ok-bg);color:var(--ok-ink)}.tag.warn{background:var(--amber-bg);color:var(--amber-ink)}.tag.bad{background:var(--bad-bg);color:var(--bad-ink)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 20px;border-radius:14px;background:var(--pri);color:var(--on-pri);font-weight:700}
+.btn.alt{background:var(--surf2);color:var(--ink);border:1px solid var(--line)}
+.btn.block{width:100%}.btn.sm{min-height:40px;padding:0 14px;font-size:14px}
+.btn[disabled]{opacity:.5;cursor:default}
+.sec{margin-top:26px}.sec>h2{margin-bottom:12px}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(270px,1fr))}
+.stepper{display:flex;align-items:center;gap:6px}.stepper button{width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:var(--surf);font-size:20px;font-weight:600}.stepper b{min-width:28px;text-align:center;font-size:18px}
+.note{font-size:12.5px;color:var(--mut);display:flex;gap:6px;align-items:center}
+
+/* hero */
+.hero{position:relative;border-radius:28px 28px 28px 8px;overflow:hidden;min-height:250px;background:linear-gradient(180deg,#17385A 0%,#4A6F97 46%,#F1B98B 100%);color:#fff}
+.hero svg.art{position:absolute;inset:0;width:100%;height:100%}
+.hero-t{position:relative;padding:22px 22px 0;max-width:560px}
+.hero-t p{opacity:.92;font-size:17px;margin-top:6px}
+.flag{transform-box:fill-box;transform-origin:50% 0;animation:sway 3.6s ease-in-out infinite}
+@keyframes sway{0%,100%{transform:skewY(-4deg)}50%{transform:skewY(4deg)}}
+@media(prefers-reduced-motion:reduce){.flag,.pulse,.fab::after,.wave i{animation:none!important}}
+@media(min-width:900px){.hero{min-height:290px}.hero-t{padding:30px 34px}}
+
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+@media(min-width:760px){.tiles{grid-template-columns:repeat(6,1fr)}}
+.tile{display:flex;flex-direction:column;align-items:flex-start;gap:14px;background:var(--surf);border:1px solid var(--line);border-radius:20px 20px 20px 6px;padding:14px;text-align:left;min-height:96px;font-weight:600;font-size:14px;line-height:1.25}
+.tile .dot{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:color-mix(in srgb,var(--c) 18%,transparent);color:var(--c)}
+.tile:hover{border-color:var(--c)}
+
+/* planner */
+.planner{display:grid;gap:18px}
+.field>label,.field>.lab{display:block;font-weight:600;margin-bottom:8px}
+.two{display:grid;gap:18px}
+@media(min-width:760px){.two{grid-template-columns:1fr 1fr}}
+.segb{display:flex;background:var(--surf2);border:1px solid var(--line);border-radius:13px;padding:3px}
+.segb button{flex:1;min-height:40px;border-radius:10px;font-weight:600;font-size:14px;color:var(--mut)}
+.segb button[aria-pressed=true]{background:var(--surf);color:var(--ink);box-shadow:0 0 0 1px var(--line)}
+.trip{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.trip .arrow{color:var(--mut)}
+.days{display:grid;gap:14px}
+.day{display:grid;grid-template-columns:54px 1fr;gap:12px}
+.dbadge{display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:14px;background:var(--ink);color:var(--bg);height:54px;line-height:1.05}
+.dbadge b{font-family:'Bricolage Grotesque',sans-serif;font-size:22px}.dbadge span{font-size:11px}
+.slots{display:grid;gap:8px}
+.slot{display:flex;align-items:center;gap:12px;background:var(--surf);border:1px solid var(--line);border-radius:14px;padding:10px 12px;min-height:54px}
+.slot .ico{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:var(--surf2);color:var(--pri);flex:none}
+.slot a,.slot button.lnk{color:var(--pri);font-weight:600;font-size:13px;text-decoration:underline;text-underline-offset:3px;min-height:36px}
+.est{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.est b{font-family:'Bricolage Grotesque',sans-serif;font-size:32px}
+
+/* map */
+.mapbox{border-radius:20px;overflow:hidden;border:1px solid var(--line);background:var(--map-land);position:relative}
+.mapbox svg{display:block;width:100%;height:100%}
+.route{display:grid;gap:16px}
+@media(min-width:900px){.route{grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);align-items:start}.route .mapbox{position:sticky;top:calc(env(safe-area-inset-top,0px) + 100px)}}
+.rmap{height:min(66vh,560px);min-height:340px}
+.rcard{display:grid;gap:8px;text-align:left;width:100%;background:var(--surf);border:1.5px solid var(--line);border-radius:18px;padding:14px}
+.rcard[aria-pressed=true]{border-color:var(--pri);box-shadow:0 0 0 1px var(--pri)}
+.rcard .big{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px}
+.rgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+input[type=range]{width:100%;accent-color:var(--pri);height:36px}
+.alert{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:14px;font-size:14px}
+.alert.warn{background:var(--amber-bg);color:var(--amber-ink)}.alert.ok{background:var(--ok-bg);color:var(--ok-ink)}
+.pulse{animation:pulse 1.6s ease-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes pulse{0%{transform:scale(.6);opacity:.7}100%{transform:scale(2.2);opacity:0}}
+
+/* cards with scenes */
+.lcard{background:var(--surf);border:1px solid var(--line);border-radius:22px 22px 22px 8px;overflow:hidden;display:flex;flex-direction:column}
+.lcard .scene{display:block;width:100%;height:132px}
+.lcard .body{padding:14px;display:grid;gap:10px;flex:1}
+.price{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:22px}
+.avatar{width:54px;height:54px;border-radius:18px 18px 18px 6px;display:grid;place-items:center;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:20px;color:#fff;flex:none}
+.trk{border:1px solid var(--line);border-radius:18px;background:var(--surf);overflow:hidden}
+.trk .mapbox{border:0;border-radius:0;height:190px}
+.trk .in{padding:12px 14px;display:grid;gap:10px}
+.bar-prog{height:8px;border-radius:8px;background:var(--surf2);overflow:hidden}.bar-prog i{display:block;height:100%;background:var(--green);border-radius:8px;transition:width .8s linear}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stat{background:var(--surf);border:1px solid var(--line);border-radius:16px;padding:12px}
+.stat b{display:block;font-family:'Bricolage Grotesque',sans-serif;font-size:24px;font-weight:800;line-height:1.1}
+
+/* permits */
+.areas{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
+.area{display:flex;gap:12px;align-items:center;text-align:left;border:1.5px solid var(--line);border-radius:16px;padding:12px;background:var(--surf);min-height:64px}
+.area[aria-pressed=true]{border-color:var(--pri);background:color-mix(in srgb,var(--pri) 10%,var(--surf))}
+.area .ck{width:26px;height:26px;border-radius:8px;border:1.5px solid var(--line);display:grid;place-items:center;flex:none;color:transparent}
+.area[aria-pressed=true] .ck{background:var(--pri);border-color:var(--pri);color:var(--on-pri)}
+.agency{display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:1.5px solid var(--line);border-radius:16px;padding:12px;background:var(--surf)}
+.agency[aria-pressed=true]{border-color:var(--pri);box-shadow:0 0 0 1px var(--pri)}
+.steps{display:grid;gap:0}
+.st{display:flex;gap:12px;align-items:center;padding:10px 0;position:relative;color:var(--mut)}
+.st .d{width:30px;height:30px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;flex:none;background:var(--surf)}
+.st.on{color:var(--ink);font-weight:600}.st.on .d{background:var(--green);border-color:var(--green);color:#fff}
+.st.cur .d{border-color:var(--pri)}
+.pass{border-radius:24px 24px 24px 8px;overflow:hidden;background:var(--surf);border:1px solid var(--line)}
+.pass .hd{background:linear-gradient(120deg,#17385A,#2B6CB0);color:#fff;padding:14px 16px;display:flex;align-items:center;gap:10px}
+.pass .bd{display:grid;grid-template-columns:1fr auto;gap:16px;padding:16px;align-items:center}
+.qr{width:104px;height:104px;background:#fff;padding:6px;border-radius:10px;border:1px solid var(--line)}
+
+/* SOS */
+.fab{position:fixed;right:14px;bottom:calc(74px + env(safe-area-inset-bottom,0px));z-index:40;width:68px;height:68px;border-radius:50%;background:var(--sos);color:#fff;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:19px;box-shadow:0 8px 22px rgba(224,47,47,.5);display:grid;place-items:center}
+.fab::after{content:"";position:absolute;inset:0;border-radius:50%;border:3px solid var(--sos);animation:pulse 2s ease-out infinite}
+.fab:active{transform:scale(.95)}
+@media(min-width:900px){.fab{bottom:28px;right:28px;width:74px;height:74px}}
+
+/* overlay */
+.ov{position:fixed;inset:0;z-index:60;background:rgba(6,16,22,.6);display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(3px)}
+.ov[hidden]{display:none}
+.sheet{width:100%;max-width:520px;max-height:96vh;overflow:auto;background:var(--surf);border-radius:26px 26px 0 0;box-shadow:var(--shadow);padding:20px 18px calc(20px + env(safe-area-inset-bottom,0px));animation:up .28s ease-out}
+@keyframes up{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+@media(min-width:760px){.ov{align-items:center}.sheet{border-radius:28px}}
+.sheet.sos{background:linear-gradient(180deg,#5A1414,#2B0A0A);color:#fff}
+.ring{position:relative;width:170px;height:170px;margin:8px auto}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring b{position:absolute;inset:0;display:grid;place-items:center;font-family:'Bricolage Grotesque',sans-serif;font-size:64px;font-weight:800}
+.contact{display:flex;align-items:center;gap:10px;padding:8px 0;opacity:0;animation:fade .4s forwards}
+@keyframes fade{to{opacity:1}}
+.tick{width:24px;height:24px;border-radius:50%;background:var(--green);display:grid;place-items:center;color:#fff}
+.sos .card{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.16)}
+.sos .mut{color:rgba(255,255,255,.72)}
+
+/* call */
+.callhead{display:flex;align-items:center;gap:12px}
+.wave{display:flex;gap:4px;align-items:center;height:34px}
+.wave i{width:5px;border-radius:4px;background:var(--green);height:8px;animation:wv 1s ease-in-out infinite}
+.wave i:nth-child(2){animation-delay:.15s}.wave i:nth-child(3){animation-delay:.3s}.wave i:nth-child(4){animation-delay:.45s}.wave i:nth-child(5){animation-delay:.6s}
+@keyframes wv{0%,100%{height:8px}50%{height:30px}}
+.caps{display:grid;gap:10px;margin:14px 0;max-height:46vh;overflow:auto;padding:2px}
+.bub{max-width:88%;padding:10px 12px;border-radius:16px 16px 16px 4px;background:var(--surf2);border:1px solid var(--line);animation:up .25s ease-out}
+.bub.me{justify-self:end;border-radius:16px 16px 4px 16px;background:color-mix(in srgb,var(--pri) 14%,var(--surf));border-color:transparent}
+.bub .pr{font-size:16px;font-weight:500}
+.bub .sc{display:flex;gap:8px;align-items:center;margin-top:6px;font-size:13px;color:var(--mut)}
+.bub .sc button{margin-left:auto;color:var(--pri);min-width:36px;min-height:36px;display:grid;place-items:center}
+
+#toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);background:var(--ink);color:var(--bg);padding:11px 16px;border-radius:14px;font-weight:600;font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:80;max-width:90vw;text-align:center}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+@media(min-width:900px){#toast{bottom:32px}}
+</style>
+</head>
+<body>
+<div id="chrome"></div>
+<div class="shell">
+  <nav class="nav" id="nav" aria-label="Main"></nav>
+  <main id="main"></main>
+</div>
+<button class="fab" id="fab" data-a="sos" aria-label="SOS">SOS</button>
+<div id="ov" class="ov" hidden></div>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+'use strict';
+/* ============ i18n ============ */
+const LI={en:0,hi:1,ne:2,bn:3};
+const LANGS={en:'English',hi:'हिन्दी',ne:'नेपाली',bn:'বাংলা'};
+const TTSL={en:'en-IN',hi:'hi-IN',ne:'ne-NP',bn:'bn-IN'};
+const D={
+tagline:["Smart & safe travel for the Himalayas","हिमालय के लिए स्मार्ट और सुरक्षित यात्रा","हिमालयका लागि स्मार्ट र सुरक्षित यात्रा","হিমালয়ের জন্য স্মার্ট ও নিরাপদ ভ্রমণ"],
+nav_home:["Home","होम","गृहपृष्ठ","হোম"],
+nav_route:["Route","रूट","बाटो","রুট"],
+nav_stay:["Stays","ठहरना","बसाइ","থাকা"],
+nav_guides:["Guides","गाइड","गाइड","গাইড"],
+nav_permits:["Permits","परमिट","परमिट","পারমিট"],
+nav_today:["Today","आज","आज","আজ"],
+nav_requests:["Requests","अनुरोध","अनुरोध","অনুরোধ"],
+nav_calls:["Calls","कॉल","कल","কল"],
+role_tourist:["Traveller","यात्री","यात्रु","ভ্রমণকারী"],
+role_host:["Host / Guide","होस्ट / गाइड","होस्ट / गाइड","হোস্ট / গাইড"],
+greet:["Namaste","नमस्ते","नमस्ते","নমস্কার"],
+home_sub:["Where to next?","अगला पड़ाव कहाँ?","अर्को गन्तव्य कहाँ?","এবার কোথায়?"],
+t_copilot:["AI Co-Pilot","AI को-पायलट","AI को-पाइलट","AI কো-পাইলট"],
+t_stays:["Homestays","होमस्टे","होमस्टे","হোমস্টে"],
+t_voice:["Voice help","आवाज़ से मदद","आवाजबाट सहयोग","কণ্ঠে সাহায্য"],
+t_safety:["Safety","सुरक्षा","सुरक्षा","নিরাপত্তা"],
+plan_title:["Plan your trip","अपनी यात्रा बनाएँ","आफ्नो यात्रा योजना बनाउनुहोस्","আপনার ভ্রমণ সাজান"],
+interests:["Interests","रुचियाँ","रुचि","আগ্রহ"],
+i_trek:["Trekking","ट्रेकिंग","ट्रेकिङ","ট্রেকিং"],
+i_monastery:["Monasteries","मठ","गुम्बा","মঠ"],
+i_culture:["Culture","संस्कृति","संस्कृति","সংস্কৃতি"],
+i_food:["Food","खाना","खाना","খাবার"],
+i_photo:["Photography","फ़ोटोग्राफ़ी","फोटोग्राफी","ফটোগ্রাফি"],
+pace:["Pace","रफ़्तार","गति","গতি"],
+pace1:["Relaxed","आराम से","आरामले","ধীরে"],
+pace2:["Balanced","संतुलित","सन्तुलित","মাঝারি"],
+pace3:["Packed","व्यस्त","व्यस्त","ঠাসা"],
+budget:["Budget","बजट","बजेट","বাজেট"],
+b1:["Saver","किफ़ायती","सस्तो","সাশ্রয়ী"],
+b2:["Comfort","आरामदायक","आरामदायी","আরামদায়ক"],
+b3:["Premium","प्रीमियम","प्रिमियम","প্রিমিয়াম"],
+build:["Build itinerary","यात्रा योजना बनाएँ","यात्रा योजना बनाउनुहोस्","ভ্রমণসূচি তৈরি করুন"],
+day:["Day","दिन","दिन","দিন"],
+ds:["days","दिन","दिन","দিন"],
+it_d1:["Drive Siliguri to Gangtok with AI Co-Pilot","AI को-पायलट के साथ सिलीगुड़ी से गंगटोक","AI को-पाइलटसँग सिलिगुडीबाट गान्तोक","AI কো-পাইলটের সঙ্গে শিলিগুড়ি থেকে গ্যাংটক"],
+it_d5:["Check out and return","चेक-आउट और वापसी","चेक-आउट र फर्कने","চেক-আউট ও ফেরা"],
+tg_permit:["Permit needed","परमिट ज़रूरी","अनुमति चाहिन्छ","পারমিট লাগবে"],
+tg_guide:["Guide advised","गाइड सुझाया","गाइड सिफारिस","গাইড প্রস্তাবিত"],
+tg_route:["AI route","AI रूट","AI बाटो","AI রুট"],
+open_route:["Open route","रूट खोलें","बाटो खोल्नुहोस्","রুট খুলুন"],
+get_permit:["Get permit","परमिट लें","अनुमति लिनुहोस्","পারমিট নিন"],
+find_guide:["Find guide","गाइड खोजें","गाइड खोज्नुहोस्","গাইড খুঁজুন"],
+est:["Estimated cost for 2","2 लोगों का अनुमानित खर्च","२ जनाको अनुमानित खर्च","২ জনের আনুমানিক খরচ"],
+copilot:["AI Co-Pilot","AI को-पायलट","AI को-पाइलट","AI কো-পাইলট"],
+twin_sub:["Digital twin of your route","आपके रूट का डिजिटल ट्विन","तपाईंको बाटोको डिजिटल ट्विन","আপনার রুটের ডিজিটাল টুইন"],
+leave_at:["Leave at","रवाना होने का समय","हिँड्ने समय","রওনার সময়"],
+fastest:["Fastest","सबसे तेज़","सबैभन्दा छिटो","সবচেয়ে দ্রুত"],
+safest:["Safest","सबसे सुरक्षित","सबैभन्दा सुरक्षित","সবচেয়ে নিরাপদ"],
+ai_pick:["AI pick","AI की पसंद","AI को छनोट","AI-এর পছন্দ"],
+arrive:["Arrive","पहुँचना","पुग्ने समय","পৌঁছানো"],
+risk:["Risk","जोखिम","जोखिम","ঝুঁকি"],
+low:["Low","कम","कम","কম"],
+med:["Medium","मध्यम","मध्यम","মাঝারি"],
+high:["High","ज़्यादा","उच्च","বেশি"],
+rain:["Rain layer","बारिश की परत","वर्षा तह","বৃষ্টির স্তর"],
+roadrisk:["Road risk","सड़क का जोखिम","सडक जोखिम","সড়কের ঝুঁকি"],
+start_drive:["Start drive","यात्रा शुरू करें","यात्रा सुरु गर्नुहोस्","যাত্রা শুরু করুন"],
+stop_drive:["Stop","रोकें","रोक्नुहोस्","থামুন"],
+alerts:["Live alerts","लाइव अलर्ट","लाइभ अलर्ट","লাইভ সতর্কতা"],
+al_rain:["Heavy rain likely on {s}","{s} पर भारी बारिश की संभावना","{s} मा भारी वर्षाको सम्भावना","{s}-এ ভারী বৃষ্টির সম্ভাবনা"],
+al_ok:["Clear conditions on your route","आपके रूट पर मौसम साफ़ है","तपाईंको बाटोमा मौसम सफा छ","আপনার রুটে আবহাওয়া পরিষ্কার"],
+al_best:["Best time to leave: {h}","निकलने का सबसे अच्छा समय: {h}","हिँड्ने उत्तम समय: {h}","রওনার সেরা সময়: {h}"],
+demo_data:["Simulated data for demo","डेमो के लिए नकली डेटा","डेमोका लागि नक्कली डाटा","ডেমোর জন্য কাল্পনিক তথ্য"],
+h:["h","घं","घ","ঘ"], m:["m","मि","मि","মি"],
+left:["left","बाकी","बाँकी","বাকি"],
+stays_title:["Verified homestays","सत्यापित होमस्टे","प्रमाणित होमस्टे","যাচাইকৃত হোমস্টে"],
+per_night:["/night","/रात","/रात","/রাত"],
+book_stay:["Request stay","ठहरने का अनुरोध","बस्ने अनुरोध","থাকার অনুরোধ"],
+verified:["Verified","सत्यापित","प्रमाणित","যাচাইকৃত"],
+req_sent:["Request sent","अनुरोध भेजा गया","अनुरोध पठाइयो","অনুরোধ পাঠানো হয়েছে"],
+confirmed:["Confirmed","पुष्टि हुई","पुष्टि भयो","নিশ্চিত"],
+declined:["Declined","अस्वीकृत","अस्वीकृत","প্রত্যাখ্যাত"],
+waiting:["Waiting for host","होस्ट के जवाब का इंतज़ार","होस्टको जवाफ पर्खँदै","হোস্টের উত্তরের অপেক্ষা"],
+track_me:["Share my arrival with host","होस्ट को मेरी पहुँच दिखाएँ","होस्टलाई मेरो आगमन देखाउनुहोस्","হোস্টকে আমার আগমন দেখান"],
+on_way:["On the way","रास्ते में","बाटोमा","পথে"],
+arriving:["Arriving in","पहुँचने में","पुग्न बाँकी","পৌঁছাতে বাকি"],
+arrived:["Arrived","पहुँच गए","पुगियो","পৌঁছেছে"],
+call_host:["Call host","होस्ट को कॉल","होस्टलाई कल","হোস্টকে কল"],
+my_book:["My bookings","मेरी बुकिंग","मेरो बुकिङ","আমার বুকিং"],
+demo_list:["Demo listings","डेमो लिस्टिंग","डेमो सूची","ডেমো তালিকা"],
+pk_view:["Kanchenjunga view","कंचनजंगा का नज़ारा","कञ्चनजङ्घाको दृश्य","কাঞ্চনজঙ্ঘার দৃশ্য"],
+pk_meals:["Home-cooked meals","घर का खाना","घरको खाना","ঘরের রান্না"],
+pk_tea:["Tea garden walk","चाय बागान की सैर","चिया बगान भ्रमण","চা-বাগানে হাঁটা"],
+pk_heat:["Heated rooms","गर्म कमरे","न्यानो कोठा","গরম ঘর"],
+pk_pick:["Free pickup","मुफ़्त पिकअप","निःशुल्क पिकअप","বিনামূল্যে পিকআপ"],
+pk_mon:["Monastery nearby","पास में मठ","नजिकै गुम्बा","কাছেই মঠ"],
+guides_title:["Registered guides","पंजीकृत गाइड","दर्ता भएका गाइड","নিবন্ধিত গাইড"],
+per_day:["/day","/दिन","/दिन","/দিন"],
+call:["Call","कॉल","कल","কল"],
+book_guide:["Book","बुक करें","बुक गर्नुहोस्","বুক করুন"],
+bg_check:["Background checked","पृष्ठभूमि जाँची गई","पृष्ठभूमि जाँच गरिएको","ব্যাকগ্রাউন্ড যাচাই"],
+speaks:["Speaks","भाषाएँ","भाषा","ভাষা"],
+live_tr:["Live translation","लाइव अनुवाद","लाइभ अनुवाद","লাইভ অনুবাদ"],
+end_call:["End call","कॉल समाप्त करें","कल समाप्त गर्नुहोस्","কল শেষ করুন"],
+tap_phrase:["Tap a phrase to say it","बोलने के लिए वाक्य चुनें","बोल्न वाक्य छान्नुहोस्","বলতে একটি বাক্য বেছে নিন"],
+ringing:["Calling","कॉल हो रहा है","कल गर्दै","কল হচ্ছে"],
+connected:["Connected","जुड़ गया","जोडियो","সংযুক্ত"],
+hears:["They hear","उन्हें सुनाई देता है","उहाँले सुन्नुहुन्छ","তাঁরা শোনেন"],
+permits_title:["Permits","परमिट","परमिट","পারমিট"],
+permits_sub:["Handled with partner agencies","पार्टनर एजेंसियों के साथ","साझेदार एजेन्सीसँग","অংশীদার এজেন্সির সাথে"],
+areas:["Areas","क्षेत्र","क्षेत्र","এলাকা"],
+travellers:["Travellers","यात्री","यात्रु","যাত্রী"],
+choose_agency:["Choose agency","एजेंसी चुनें","एजेन्सी छान्नुहोस्","এজেন্সি বেছে নিন"],
+docs:["Documents","दस्तावेज़","कागजात","নথি"],
+upload_id:["Upload ID photo","पहचान-पत्र की फ़ोटो अपलोड करें","परिचयपत्रको फोटो अपलोड गर्नुहोस्","পরিচয়পত্রের ছবি আপলোড করুন"],
+uploaded:["Uploaded","अपलोड हुआ","अपलोड भयो","আপলোড হয়েছে"],
+apply:["Apply for permit","परमिट के लिए आवेदन करें","अनुमतिका लागि आवेदन दिनुहोस्","পারমিটের আবেদন করুন"],
+st_docs:["Documents checked","दस्तावेज़ जाँचे गए","कागजात जाँचियो","নথি যাচাই হয়েছে"],
+st_sub:["Submitted to authority","अधिकारी को भेजा गया","अधिकारीलाई पठाइयो","কর্তৃপক্ষকে পাঠানো হয়েছে"],
+st_ready:["Permit ready","परमिट तैयार","अनुमति तयार","পারমিট প্রস্তুত"],
+fee:["Agency fee","एजेंसी शुल्क","एजेन्सी शुल्क","এজেন্সি ফি"],
+rules:["Rules vary by area. Your agency confirms them.","नियम क्षेत्र के अनुसार बदलते हैं। आपकी एजेंसी पुष्टि करेगी।","नियम क्षेत्र अनुसार फरक हुन्छन्। तपाईंको एजेन्सीले पुष्टि गर्नेछ।","নিয়ম এলাকাভেদে আলাদা। আপনার এজেন্সি নিশ্চিত করবে।"],
+need_more:["Pick an area, an agency and upload your ID","क्षेत्र, एजेंसी चुनें और पहचान-पत्र अपलोड करें","क्षेत्र, एजेन्सी छान्नुहोस् र परिचयपत्र अपलोड गर्नुहोस्","এলাকা, এজেন্সি বেছে নিন ও পরিচয়পত্র আপলোড করুন"],
+valid:["Valid","मान्य","मान्य","বৈধ"],
+sos_title:["Emergency alert","आपातकालीन अलर्ट","आपतकालीन अलर्ट","জরুরি সতর্কতা"],
+sending_in:["Sending in","भेजा जा रहा है","पठाइँदैछ","পাঠানো হচ্ছে"],
+cancel:["Cancel","रद्द करें","रद्द गर्नुहोस्","বাতিল"],
+sos_sent:["Alert sent","अलर्ट भेजा गया","अलर्ट पठाइयो","সতর্কতা পাঠানো হয়েছে"],
+notified:["Contacts notified","संपर्कों को सूचना मिली","सम्पर्कहरूलाई जानकारी गयो","যোগাযোগদের জানানো হয়েছে"],
+nearest:["Nearest help","सबसे नज़दीकी मदद","नजिकको सहयोग","নিকটতম সাহায্য"],
+live_loc:["Live location is being shared","लाइव लोकेशन साझा हो रही है","लाइभ लोकेशन साझा हुँदैछ","লাইভ লোকেশন শেয়ার হচ্ছে"],
+low_net:["Low network","कमज़ोर नेटवर्क","कमजोर नेटवर्क","দুর্বল নেটওয়ার্ক"],
+sms_fb:["No data. Sent by SMS, will sync when online.","डेटा नहीं। SMS से भेजा, नेटवर्क आने पर सिंक होगा।","डाटा छैन। SMS बाट पठाइयो, नेटवर्क आएपछि सिंक हुन्छ।","ডেটা নেই। SMS-এ পাঠানো হয়েছে, নেটওয়ার্ক এলে সিঙ্ক হবে।"],
+im_safe:["I'm safe","मैं सुरक्षित हूँ","म सुरक्षित छु","আমি নিরাপদ"],
+near:["Near Ravangla","रावंगला के पास","रावाङ्गला नजिक","রাভাংলার কাছে"],
+km:["km","कि.मी.","कि.मी.","কিমি"],
+guests_today:["Guests today","आज के मेहमान","आजका पाहुना","আজকের অতিথি"],
+earnings:["This month","इस महीने","यो महिना","এই মাস"],
+rating:["Rating","रेटिंग","रेटिङ","রেটিং"],
+guest_way:["{n} is on the way","{n} रास्ते में हैं","{n} बाटोमा हुनुहुन्छ","{n} পথে আছেন"],
+check_in:["Mark checked in","चेक-इन करें","चेक-इन गर्नुहोस्","চেক-ইন করুন"],
+checked:["Checked in","चेक-इन हो गया","चेक-इन भयो","চেক-ইন হয়েছে"],
+accept:["Accept","स्वीकारें","स्वीकार्नुहोस्","গ্রহণ করুন"],
+decline:["Decline","अस्वीकारें","अस्वीकार्नुहोस्","প্রত্যাখ্যান"],
+no_req:["No requests","कोई अनुरोध नहीं","अनुरोध छैन","কোনো অনুরোধ নেই"],
+guest_sos:["Guest SOS alert","मेहमान का SOS अलर्ट","पाहुनाको SOS अलर्ट","অতিথির SOS সতর্কতা"],
+available:["Available for bookings","बुकिंग के लिए उपलब्ध","बुकिङका लागि उपलब्ध","বুকিংয়ের জন্য উপলব্ধ"],
+incoming:["Incoming call","आने वाली कॉल","आउँदै गरेको कल","ইনকামিং কল"],
+sim_call:["Simulate a traveller call","यात्री की कॉल का डेमो","यात्रीको कलको डेमो","ভ্রমণকারীর কলের ডেমো"],
+demo_guest:["Send a demo guest","डेमो मेहमान भेजें","डेमो पाहुना पठाउनुहोस्","ডেমো অতিথি পাঠান"],
+no_guest:["No guest on the way","कोई मेहमान रास्ते में नहीं","बाटोमा कुनै पाहुना छैन","পথে কোনো অতিথি নেই"],
+recent:["Recent calls","हाल की कॉल","हालैका कल","সাম্প্রতিক কল"],
+nights:["nights","रातें","रात","রাত"],
+guests:["guests","मेहमान","पाहुना","অতিথি"],
+call_end:["Call ended","कॉल समाप्त","कल समाप्त","কল শেষ"],
+handled:["Handled","निपटाए गए","सम्पन्न","সম্পন্ন"]
+};
+const CALL={
+c1:["Hello! Which trek do you have in mind?","नमस्ते! आप कौन सा ट्रेक करना चाहते हैं?","नमस्ते! तपाईं कुन ट्रेकमा जान चाहनुहुन्छ?","নমস্কার! আপনি কোন ট্রেকে যেতে চান?"],
+c2:["Is the Dzongri trek fine for beginners?","क्या ज़ोंगरी ट्रेक शुरुआती लोगों के लिए ठीक है?","के जोङ्गरी ट्रेक सुरुवाती मानिसका लागि ठीक छ?","জোংরি ট্রেক কি নতুনদের জন্য ঠিক আছে?"],
+c3:["Yes, it takes four days. I will bring the permits and a first-aid kit.","हाँ, चार दिन लगते हैं। मैं परमिट और प्राथमिक उपचार किट लाऊँगा।","हो, चार दिन लाग्छ। म अनुमतिपत्र र प्राथमिक उपचार किट ल्याउँछु।","হ্যাঁ, চার দিন লাগে। আমি পারমিট আর ফার্স্ট-এইড কিট নিয়ে আসব।"],
+c4:["Can you meet us at the homestay at 6 am?","क्या आप सुबह 6 बजे होमस्टे पर मिल सकते हैं?","के तपाईं बिहान ६ बजे होमस्टेमा भेट्न सक्नुहुन्छ?","আপনি কি সকাল ৬টায় হোমস্টেতে দেখা করতে পারবেন?"],
+c5:["Sure. Please bring warm clothes, it will be cold.","ज़रूर। गर्म कपड़े ले आइए, ठंड होगी।","पक्का। न्यानो कपडा ल्याउनुहोस्, जाडो हुन्छ।","অবশ্যই। গরম কাপড় আনবেন, ঠান্ডা থাকবে।"],
+p1:["Is the trail open today?","क्या आज रास्ता खुला है?","के आज बाटो खुला छ?","আজ কি পথ খোলা আছে?"],
+r1:["Yes, open until 3 pm. Clouds come after.","हाँ, दोपहर 3 बजे तक खुला है। उसके बाद बादल आते हैं।","हो, दिउँसो ३ बजेसम्म खुला छ। त्यसपछि बादल आउँछ।","হ্যাঁ, বিকেল ৩টা পর্যন্ত খোলা। তারপর মেঘ আসে।"],
+p2:["How much for two people?","दो लोगों के लिए कितना लगेगा?","दुई जनाको लागि कति पर्छ?","দুজনের জন্য কত লাগবে?"],
+r2:["₹2,400 a day for two people, food included.","दो लोगों के लिए ₹2,400 प्रतिदिन, खाना शामिल।","दुई जनाको लागि दिनको ₹२,४००, खाना समेत।","দুজনের জন্য দিনে ₹২,৪০০, খাবার সহ।"],
+p3:["I need to rest.","मुझे आराम करना है।","मलाई आराम गर्नु छ।","আমার একটু বিশ্রাম দরকার।"],
+r3:["No problem. There is a tea stop in ten minutes.","कोई बात नहीं। दस मिनट में चाय की दुकान है।","ठीक छ। दस मिनेटमा चिया पसल छ।","কোনো সমস্যা নেই। দশ মিনিটে চায়ের দোকান আছে।"]
+};
+const S={lang:'en',role:'tourist',tab:'home',htab:'today',net:true,
+  interests:new Set(['trek','monastery']),pace:2,budget:2,dep:7,pick:'auto',layers:{rain:true,risk:true},
+  bookings:[],seq:0,areas:new Set(),agency:null,trav:2,idOk:false,permit:null,driving:false,
+  earn:18400,sosSent:false,call:null,sos:null,
+  seeds:[
+    {id:'s1',seed:1,who:'Rohan & Meera',what:{k:'stay',n:'Lepcha Nest Homestay',q:2},amt:3600,status:'pending'},
+    {id:'s2',seed:1,who:'Ishaan K.',what:{k:'guide',n:'Pemba Sherpa',q:4},amt:9600,status:'pending'}
+  ]};
+try{const l=localStorage.getItem('ts_lang');if(l&&LANGS[l])S.lang=l}catch(e){}
+function t(k,p){const r=D[k];let s=r?(r[LI[S.lang]]||r[0]):(CALL[k]?CALL[k][LI[S.lang]]:k);if(p)for(const x in p)s=s.replace('{'+x+'}',p[x]);return s}
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const inr=n=>'₹'+Math.round(n).toLocaleString('en-IN');
+
+/* ============ icons ============ */
+const IC={
+home:'<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/>',
+route:'<circle cx="6" cy="19" r="2.5"/><circle cx="18" cy="5" r="2.5"/><path d="M8.5 19H15a3.5 3.5 0 0 0 0-7H9a3.5 3.5 0 0 1 0-7h6.5"/>',
+bed:'<path d="M3 20V6"/><path d="M3 15h18v5"/><path d="M21 15v-3a3 3 0 0 0-3-3h-8v6"/><circle cx="6.5" cy="11" r="1.8"/>',
+user:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+doc:'<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h6"/>',
+phone:'<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/>',
+pin:'<path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>',
+check:'<path d="m5 12.5 4.5 4.5L19 7.5"/>',
+x:'<path d="M6 6l12 12M18 6 6 18"/>',
+globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>',
+shield:'<path d="M12 3 4 6v6c0 4.5 3.3 8 8 9 4.7-1 8-4.5 8-9V6z"/><path d="m9 12 2.2 2.2L15.5 10"/>',
+clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+star:'<path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>',
+mountain:'<path d="m3 20 6.5-11 4 6.5 2-3L21 20z"/>',
+volume:'<path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5z"/><path d="M15.5 9a4 4 0 0 1 0 6"/><path d="M18 6.5a8 8 0 0 1 0 11"/>',
+alert:'<path d="M12 3 2.5 20h19z"/><path d="M12 10v5M12 17.5v.5"/>',
+spark:'<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z"/>',
+upload:'<path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 20h16"/>',
+signal:'<path d="M4 20v-3M9 20v-7M14 20V9M19 20V4"/>',
+mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',
+cloud:'<path d="M7 18a4 4 0 0 1-.5-8A6 6 0 0 1 18 10a4 4 0 0 1 0 8z"/>',
+arrow:'<path d="M5 12h14M13 6l6 6-6 6"/>',
+heart:'<path d="M12 20s-7-4.6-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.4-7 10-7 10z"/>'
+};
+const ic=(n,s=22)=>`<svg class="ic" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[n]}</svg>`;
+const FL=['#2B6CB0','#F1F5F7','#D64545','#2F9E63','#F2B632'];
+
+/* ============ data ============ */
+const STAYS=[
+ {id:'pel',name:'Lepcha Nest Homestay',place:'Pelling',host:'Dorjee Lepcha',price:1800,rate:4.8,langs:['ne','hi','en'],perks:['pk_view','pk_meals'],dest:[108,435],hl:'ne'},
+ {id:'dar',name:'Tea Terrace Homestay',place:'Darjeeling',host:'Anita Rai',price:2200,rate:4.9,langs:['ne','bn','hi','en'],perks:['pk_tea','pk_heat'],dest:[124,661],hl:'ne'},
+ {id:'rum',name:'Rumtek Ridge Stay',place:'Gangtok',host:'Tashi Bhutia',price:1500,rate:4.7,langs:['hi','ne','en'],perks:['pk_mon','pk_pick'],dest:[341,443],hl:'hi'}
+];
+const GUIDES=[
+ {id:'pem',name:'Pemba Sherpa',sp:['i_trek','i_photo'],price:2400,rate:4.9,langs:['ne','hi','en'],lang:'ne',hue:'#2B6CB0',yrs:12},
+ {id:'sum',name:'Suman Chettri',sp:['i_monastery','i_culture','i_food'],price:1800,rate:4.8,langs:['ne','bn','hi','en'],lang:'ne',hue:'#2F9E63',yrs:9},
+ {id:'son',name:'Sonam Tamang',sp:['i_photo','i_trek'],price:2000,rate:4.7,langs:['hi','ne','en'],lang:'hi',hue:'#C9861A',yrs:7}
+];
+const AREAS=[
+ {id:'tso',n:'Tsomgo Lake & Nathula',d:'1 day'},
+ {id:'lac',n:'Lachung & Yumthang',d:'2 days'},
+ {id:'zul',n:'Zuluk & Silk Route',d:'2 days'},
+ {id:'dzo',n:'Dzongri trek, West Sikkim',d:'4 days'}
+];
+const AGENCIES=[
+ {id:'him',n:'Himal Trails',c:'Gangtok',fee:200,rate:4.8},
+ {id:'kan',n:'Kanchen Travels',c:'Siliguri',fee:150,rate:4.6},
+ {id:'tee',n:'Teesta Tours',c:'Darjeeling',fee:250,rate:4.9}
+];
+const POOL={
+ trek:[['Hilley–Varsey rhododendron trail','g'],['Yuksom to Tshoka trail','g'],['Singalila ridge walk','g'],['Tiger Hill sunrise walk','g']],
+ monastery:[['Rumtek Monastery'],['Enchey Monastery'],['Pemayangtse Monastery'],['Tashiding Monastery']],
+ culture:[['Namgyal Institute of Tibetology'],['MG Marg evening walk'],['Lepcha weaving workshop'],['Cooking with a host family']],
+ food:[['Momo and thukpa crawl'],['Tea tasting at a Darjeeling estate'],['Sel roti breakfast with a host family'],['Butter tea and chhurpi tasting']],
+ photo:[['Ganesh Tok viewpoint'],['Kanchenjunga sunrise viewpoint'],['Bakthang waterfall'],['Tsomgo Lake at first light','p']]
+};
+const ELEV={A:[[0,120],[22,200],[57,300],[85,900],[115,1650]],B:[[0,120],[62,1250],[117,1100],[162,1650]]};
+const ROUTES={
+ A:{id:'A',n:'NH10 via Rangpo',spd:38,pts:[[256,948],[279,800],[270,700],[258,609],[333,539],[370,470],[395,409]],
+    segs:[{n:'Siliguri to Sevoke',a:0,b:1,km:22,base:.10,sens:.2},{n:'Teesta valley',a:1,b:3,km:35,base:.30,sens:.8},{n:'Rangpo to Gangtok',a:3,b:6,km:58,base:.20,sens:.5}]},
+ B:{id:'B',n:'Via Kalimpong and Rhenock',spd:34,pts:[[256,948],[279,800],[287,644],[340,590],[372,557],[388,522],[400,470],[395,409]],
+    segs:[{n:'Siliguri to Kalimpong',a:0,b:2,km:62,base:.15,sens:.4},{n:'Kalimpong to Rhenock',a:2,b:5,km:55,base:.10,sens:.3},{n:'Rhenock to Gangtok',a:5,b:7,km:45,base:.15,sens:.35}]}
+};
+const TOWNS=[
+ {n:'Siliguri',p:[256,948]},{n:'Kalimpong',p:[287,644]},{n:'Darjeeling',p:[124,661]},{n:'Gangtok',p:[395,409],big:1},
+ {n:'Pelling',p:[108,435]},{n:'Namchi',p:[201,548]},{n:'Ravangla',p:[201,435]},{n:'Rangpo',p:[333,539],e:1},
+ {n:'Rhenock',p:[388,522]},{n:'Lachung',p:[496,96]},{n:'Yuksom',p:[93,374]},{n:'Tsomgo',p:[511,370]}
+];
+const HELP=[
+ {n:'Ravangla health centre',p:[207,441],k:'plus'},
+ {n:'District hospital, Namchi',p:[201,548],k:'plus'},
+ {n:'STNM hospital, Gangtok',p:[395,409],k:'plus'}
+];
+const ME=[201,435];
+const KM_PX=0.128;
+
+/* ============ svg helpers ============ */
+function smooth(pts){
+  if(pts.length<3)return 'M'+pts.map(p=>p.join(' ')).join('L');
+  let d='M'+pts[0].join(' ');
+  for(let i=0;i<pts.length-1;i++){
+    const p0=pts[i-1]||pts[i],p1=pts[i],p2=pts[i+1],p3=pts[i+2]||p2;
+    const c1=[p1[0]+(p2[0]-p0[0])/6,p1[1]+(p2[1]-p0[1])/6],c2=[p2[0]-(p3[0]-p1[0])/6,p2[1]-(p3[1]-p1[1])/6];
+    d+=`C${c1[0].toFixed(1)} ${c1[1].toFixed(1)} ${c2[0].toFixed(1)} ${c2[1].toFixed(1)} ${p2[0]} ${p2[1]}`;
+  }
+  return d;
+}
+function blob(cx,cy,r,s){let d='';for(let i=0;i<=48;i++){const a=i/48*Math.PI*2,rr=r*(1+.16*Math.sin(3*a+s)+.09*Math.sin(5*a+2*s)+.05*Math.sin(9*a+s*3));d+=(i?'L':'M')+(cx+rr*Math.cos(a)).toFixed(1)+' '+(cy+rr*Math.sin(a)*1.15).toFixed(1)}return d+'Z'}
+const CONTOURS=(()=>{let s='';[[40,90,1],[490,110,2],[150,560,3],[400,420,4],[300,760,5]].forEach(([x,y,z],j)=>{const max=j===0?230:j===1?190:j===4?110:130;for(let r=26;r<max;r+=26)s+=`<path d="${blob(x,y,r,z)}" fill="none" stroke="var(--map-cont)" stroke-width="1" opacity="${(1-r/max*.6).toFixed(2)}"/>`});return s})();
+const RIVER='M496 96C470 180 430 240 420 300S340 430 330 520 300 640 285 720 270 860 262 940';
+const ROADS=[[[256,948],[200,850],[150,740],[124,661]],[[395,409],[450,390],[511,370]],[[395,409],[430,300],[470,200],[496,96]],[[201,548],[201,435],[150,430],[108,435],[93,374]],[[201,548],[270,545],[333,539]]];
+function baseMap(showLabels=true){
+  let s=`<rect x="-900" y="-900" width="2400" height="2800" fill="var(--map-land)"/>${CONTOURS}`;
+  s+=`<path d="${RIVER}" fill="none" stroke="var(--map-river)" stroke-width="4" stroke-linecap="round" opacity=".8"/>`;
+  ROADS.forEach(r=>s+=`<path d="${smooth(r)}" fill="none" stroke="var(--map-road)" stroke-width="2" stroke-dasharray="1 5" stroke-linecap="round"/>`);
+  s+=`<g font-size="13" font-style="italic" fill="var(--map-txt)" opacity=".55" font-family="Noto Sans,sans-serif"><text x="-60" y="250">Nepal</text><text x="440" y="30">Tibet</text><text x="545" y="560">Bhutan</text></g>`;
+  if(showLabels)TOWNS.forEach(w=>{s+=`<circle cx="${w.p[0]}" cy="${w.p[1]}" r="${w.big?5:3.5}" fill="var(--map-pin)"/><text x="${w.p[0]+(w.e?-9:9)}" y="${w.p[1]+4}" text-anchor="${w.e?'end':'start'}" font-size="${w.big?14:12}" font-weight="${w.big?700:500}" fill="var(--map-txt)" font-family="Noto Sans,sans-serif" paint-order="stroke" stroke="var(--map-land)" stroke-width="3">${w.n}</text>`});
+  return s;
+}
+function pinSVG(x,y,c='var(--sos)'){return `<g transform="translate(${x},${y})"><circle r="14" fill="${c}" class="pulse" opacity=".5"/><path d="M0 0C-9-12-12-18-12-24a12 12 0 0 1 24 0C12-18 9-12 0 0z" transform="translate(0,-2)" fill="${c}" stroke="#fff" stroke-width="2"/><circle cy="-26" r="4.5" fill="#fff"/></g>`}
+
+function scene(i){
+  const P=[['#FBD9A8','#F08A5D','#5B7794','#22364A'],['#CDE7F5','#8DB8D9','#4A7BA0','#26485F'],['#E6F0D2','#A9CE96','#4E8A63','#25523F'],['#F7E3B8','#EBB35E','#8C6A4F','#4A3A32']][i%4];
+  let r=i*7+3;const rnd=()=>(r=(r*9301+49297)%233280)/233280;
+  let m1='M0 140',x=0;while(x<300){x+=30+rnd()*30;m1+=`L${x.toFixed(0)} ${(50+rnd()*46).toFixed(0)}L${(x+22).toFixed(0)} ${(80+rnd()*30).toFixed(0)}`}
+  const g='sg'+i;
+  return `<svg class="scene" viewBox="0 0 300 140" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs><linearGradient id="${g}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${P[0]}"/><stop offset="1" stop-color="${P[1]}"/></linearGradient></defs><rect width="300" height="140" fill="url(#${g})"/><circle cx="${60+i*40}" cy="42" r="16" fill="#fff" opacity=".8"/><path d="${m1}L300 140Z" fill="${P[2]}"/><path d="M0 140V112Q60 80 120 108T240 100T300 112V140Z" fill="${P[3]}"/><g transform="translate(196,84)"><rect width="34" height="22" fill="#fff"/><path d="M-4 0 17-14 38 0z" fill="#D64545"/><rect x="13" y="8" width="8" height="14" fill="${P[3]}"/></g><path d="M20 30Q150 58 280 26" stroke="#fff" stroke-width="1" fill="none" opacity=".8"/>${[0,1,2,3,4,5,6,7].map(k=>{const tt=(k+.5)/8,px=20+260*tt,py=30+ (1-Math.pow(1-tt,2)-tt*tt)*0+(28*4*tt*(1-tt)*0.5)+ (-4*tt)*1;return `<rect x="${px.toFixed(0)}" y="${(py+ (tt*-4)).toFixed(0)}" width="9" height="11" fill="${FL[k%5]}"/>`}).join('')}</svg>`;
+}
+
+/* ============ chrome ============ */
+function chrome(){
+  $('#chrome').innerHTML=`<header class="top"><div class="strip">${FL.map(c=>`<i style="background:${c}"></i>`).join('')}</div>
+  <div class="bar">
+   <div class="brand"><svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3 28.4 12 23.6 26.5 8.4 26.5 3.6 12 Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="21.5" cy="9.6" r="2" fill="#D2724A"/><path d="M6.5 22 12 13 15.5 18 19 11 25.5 22 Z" fill="currentColor"/></svg><span>HIMITRA</span></div>
+   <div class="seg" role="group">
+     <button data-a="role" data-v="tourist" aria-pressed="${S.role==='tourist'}">${ic('mountain',18)}${t('role_tourist')}</button>
+     <button data-a="role" data-v="host" aria-pressed="${S.role==='host'}">${ic('heart',18)}${t('role_host')}</button>
+   </div>
+   <div class="tools">
+     <button class="pill-btn" data-a="net" aria-pressed="${!S.net}" title="${t('low_net')}">${ic('signal',18)}<span>${S.net?'':t('low_net')}</span></button>
+     <label class="sr" for="lang">Language</label>
+     <select class="lang" id="lang" data-in="lang">${Object.entries(LANGS).map(([k,v])=>`<option value="${k}" ${k===S.lang?'selected':''}>${v}</option>`).join('')}</select>
+   </div>
+  </div></header>`;
+  const items=S.role==='tourist'?[['home','home','nav_home','--blue'],['route','route','nav_route','--sky'],['stay','bed','nav_stay','--yellow'],['guides','user','nav_guides','--green'],['permits','doc','nav_permits','--ink']]
+     :[['today','home','nav_today','--blue'],['requests','bed','nav_requests','--yellow'],['calls','phone','nav_calls','--green']];
+  const cur=S.role==='tourist'?S.tab:S.htab;
+  $('#nav').innerHTML=items.map(([k,i,l,c])=>`<button class="nv" style="--c:var(${c})" data-a="tab" data-v="${k}" ${k===cur?'aria-current="page"':''}>${ic(i)}<span>${t(l)}</span></button>`).join('');
+  $('#fab').hidden=S.role!=='tourist';
+}
+
+/* ============ views: tourist ============ */
+function heroSVG(){
+  let flags='';for(let i=0;i<13;i++){const tt=(i+.6)/13.6,x=600*tt,y=40+100*tt*(1-tt)*1.0;flags+=`<polygon class="flag" style="animation-delay:${(i*.27).toFixed(2)}s" points="${(x-12).toFixed(1)},${(y+1).toFixed(1)} ${(x+12).toFixed(1)},${(y+1).toFixed(1)} ${(x+12).toFixed(1)},${(y+25).toFixed(1)} ${x.toFixed(1)},${(y+19).toFixed(1)} ${(x-12).toFixed(1)},${(y+25).toFixed(1)}" fill="${FL[i%5]}"/>`}
+  return `<svg class="art" viewBox="0 0 600 260" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+   <circle cx="470" cy="118" r="30" fill="#FFE3B8" opacity=".9"/>
+   <path d="M0 260V178L70 140 120 160 210 92 250 122 310 52 372 118 420 96 490 150 545 128 600 165V260Z" fill="#C6D3E6"/>
+   <path d="M310 52 293 84 310 76 322 92 337 78 372 118 340 82z" fill="#fff" opacity=".9"/>
+   <path d="M210 92 190 124 210 116 226 130 250 122z" fill="#fff" opacity=".85"/>
+   <path d="M0 260V208L60 178 130 200 200 168 280 206 350 186 430 214 520 182 600 210V260Z" fill="#3B5D78"/>
+   <path d="M0 260V232L80 214 170 236 260 218 360 240 470 222 600 238V260Z" fill="#1F3A4E"/>
+   <path d="M0 40Q300 140 600 40" stroke="#fff" stroke-width="1.4" fill="none" opacity=".85"/>${flags}</svg>`;
+}
+function vHome(){
+  const tile=(i,l,c,a,v)=>`<button class="tile" style="--c:var(${c})" data-a="${a}" ${v?`data-v="${v}"`:''}><span class="dot">${ic(i,20)}</span>${t(l)}</button>`;
+  const ints=[['trek','i_trek'],['monastery','i_monastery'],['culture','i_culture'],['food','i_food'],['photo','i_photo']];
+  return `<section class="hero"><div class="hero-t"><h1>${t('greet')}</h1><p>${t('home_sub')}</p></div>${heroSVG()}</section>
+  <div class="tiles">
+   ${tile('route','t_copilot','--sky','tab','route')}${tile('bed','t_stays','--yellow','tab','stay')}${tile('user','nav_guides','--green','tab','guides')}
+   ${tile('doc','nav_permits','--blue','tab','permits')}${tile('mic','t_voice','--ink','voice')}${tile('shield','t_safety','--sos','sos')}
+  </div>
+  <section class="sec"><h2>${t('plan_title')}</h2>
+   <div class="card planner">
+    <div class="trip"><span class="chip">${ic('pin',18)}Siliguri</span><span class="arrow">${ic('arrow',18)}</span><span class="chip">${ic('pin',18)}Gangtok</span><span class="chip">${ic('clock',18)}12–17 Oct</span></div>
+    <div class="field"><span class="lab">${t('interests')}</span><div class="chips">${ints.map(([k,l])=>`<button class="chip" data-a="int" data-v="${k}" aria-pressed="${S.interests.has(k)}">${t(l)}</button>`).join('')}</div></div>
+    <div class="two">
+     <div class="field"><span class="lab">${t('pace')}</span><div class="segb">${[1,2,3].map(n=>`<button data-a="pace" data-v="${n}" aria-pressed="${S.pace===n}">${t('pace'+n)}</button>`).join('')}</div></div>
+     <div class="field"><span class="lab">${t('budget')}</span><div class="segb">${[1,2,3].map(n=>`<button data-a="budget" data-v="${n}" aria-pressed="${S.budget===n}">${t('b'+n)}</button>`).join('')}</div></div>
+    </div>
+    <button class="btn" data-a="build">${ic('spark',20)}${t('build')}</button>
+   </div>
+  </section>
+  <section class="sec" id="itin"></section>`;
+}
+function itinerary(){
+  const keys=[...S.interests];if(!keys.length)keys.push('culture');
+  const days=[{d:1,items:[{ic:'route',title:t('it_d1'),tags:['tg_route'],act:['open_route','goroute']}]}];
+  for(let d=2;d<=4;d++){
+    const items=[];
+    for(let i=0;i<S.pace;i++){
+      const k=keys[(d+i)%keys.length],pool=POOL[k],e=pool[(d-2+i)%pool.length];
+      const tags=[];let act=null;
+      if(e[1]==='g'){tags.push('tg_guide');act=['find_guide','goguides']}
+      if(e[1]==='p'){tags.push('tg_permit');act=['get_permit','gopermits']}
+      items.push({ic:k==='trek'?'mountain':k==='food'?'heart':k==='photo'?'pin':'spark',title:e[0],tags,act});
+    }
+    days.push({d,items});
+  }
+  days.push({d:5,items:[{ic:'home',title:t('it_d5'),tags:[]}]});
+  const stay=[1500,2200,3800][S.budget-1],perDay=stay+900+S.pace*450;
+  const total=perDay*4+(S.interests.has('trek')?2400*2:0)+1800;
+  return `<h2>${t('ai_note_h')||''}</h2>`.replace('<h2></h2>','')+`<div class="days">${days.map(x=>`<div class="day"><div class="dbadge"><span>${t('day')}</span><b>${x.d}</b></div><div class="slots">${x.items.map(it=>`<div class="slot"><span class="ico">${ic(it.ic,18)}</span><div class="sp"><div class="b">${it.title}</div>${it.tags.map(g=>`<span class="tag ${g==='tg_permit'?'warn':''}">${t(g)}</span>`).join(' ')}</div>${it.act?`<button class="lnk" data-a="${it.act[1]}">${t(it.act[0])}</button>`:''}</div>`).join('')}</div></div>`).join('')}</div>
+  <div class="card est" style="margin-top:14px"><span class="mut">${t('est')}</span><b>${inr(total)}</b><span class="tag">${t('demo_data')}</span></div>`;
+}
+
+/* route engine */
+const rainAt=h=>Math.min(1,.1+.9*Math.exp(-Math.pow(h-15.5,2)/(2*2.4*2.4)));
+function evalRoute(r,dep){
+  let tt=dep,tot=0,maxR=0;const segs=[];
+  r.segs.forEach(s=>{const mid=tt+(s.km/r.spd)/2,rn=rainAt(mid),risk=Math.min(1,s.base+rn*s.sens*.75),hrs=s.km/r.spd*(1+.5*rn*s.sens);segs.push({...s,risk,hrs,rn});tt+=hrs;tot+=hrs;maxR=Math.max(maxR,risk)});
+  return {segs,total:tot,arrive:dep+tot,maxR,score:tot+4*maxR,km:r.segs.reduce((a,s)=>a+s.km,0)};
+}
+const riskCls=x=>x<.25?'low':x<.5?'med':'high';
+const riskCol=x=>x<.25?'var(--green)':x<.5?'var(--yellow)':'var(--red)';
+const riskTag=x=>x<.25?'ok':x<.5?'warn':'bad';
+function fmtT(h){h=((h%24)+24)%24;let hh=Math.floor(h),mm=Math.round((h-hh)*60);if(mm===60){hh++;mm=0}const ap=hh>=12?'pm':'am';const h12=hh%12||12;return `${h12}:${String(mm).padStart(2,'0')} ${ap}`}
+function fmtD(x){const hh=Math.floor(x),mm=Math.round((x-hh)*60);return `${hh}${t('h')} ${mm}${t('m')}`}
+function aiPick(dep){const a=evalRoute(ROUTES.A,dep),b=evalRoute(ROUTES.B,dep);return a.score<=b.score?'A':'B'}
+function bestDep(){let best=5,bs=1e9;for(let h=5;h<=14;h+=.5){const s=Math.min(evalRoute(ROUTES.A,h).score,evalRoute(ROUTES.B,h).score);if(s<bs){bs=s;best=h}}return best}
+function vRoute(){
+  return `<div class="row" style="margin-bottom:12px"><h2 class="disp">${t('copilot')}</h2><span class="tag">${ic('spark',14)}${t('twin_sub')}</span></div>
+  <div class="route"><div class="mapbox rmap" id="rt-map"></div>
+   <div style="display:grid;gap:14px">
+    <div class="card"><div class="row"><label for="dep" class="b">${t('leave_at')}</label><span class="sp"></span><b class="disp" style="font-size:22px" id="dep-l"></b></div>
+     <input id="dep" type="range" min="5" max="14" step="0.5" value="${S.dep}" data-in="dep">
+     <div class="chips"><button class="chip" data-a="layer" data-v="rain" aria-pressed="${S.layers.rain}">${ic('cloud',18)}${t('rain')}</button><button class="chip" data-a="layer" data-v="risk" aria-pressed="${S.layers.risk}">${ic('alert',18)}${t('roadrisk')}</button></div></div>
+    <div id="rt-cards" style="display:grid;gap:10px"></div>
+    <div class="card"><div class="b" style="margin-bottom:8px">${t('alerts')}</div><div id="rt-alerts" style="display:grid;gap:8px"></div></div>
+    <div class="card"><div id="rt-elev"></div></div>
+    <div class="row"><button class="btn sp" id="drivebtn" data-a="drive">${ic('route',20)}<span>${t('start_drive')}</span></button></div>
+    <div id="rt-prog" class="sm mut"></div>
+    <div class="note">${ic('alert',14)}${t('demo_data')}</div>
+   </div></div>`;
+}
+function chosen(){return S.pick==='auto'?aiPick(S.dep):S.pick}
+function updateRoute(){
+  const box=$('#rt-map');if(!box)return;
+  stopDrive(true);
+  const evA=evalRoute(ROUTES.A,S.dep),evB=evalRoute(ROUTES.B,S.dep),ai=aiPick(S.dep),ch=chosen();
+  const EV={A:evA,B:evB};
+  $('#dep-l').textContent=fmtT(S.dep);
+  // map
+  const rain=rainAt(S.dep+2.5);
+  let svg=`<svg viewBox="110 370 380 600" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Route map">${baseMap()}`;
+  if(S.layers.rain)svg+=`<defs><pattern id="rp" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(18)"><line x1="0" y1="0" x2="0" y2="9" stroke="var(--map-river)" stroke-width="1.6" opacity=".9"/><animateTransform attributeName="patternTransform" type="translate" additive="sum" from="0 0" to="0 14" dur=".7s" repeatCount="indefinite"/></pattern></defs><rect x="-900" y="-900" width="2400" height="2800" fill="url(#rp)" opacity="${(rain*.55).toFixed(2)}" pointer-events="none"/><rect x="-900" y="-900" width="2400" height="2800" fill="#4B6A80" opacity="${(rain*.16).toFixed(2)}" pointer-events="none"/>`;
+  const other=ch==='A'?'B':'A';
+  svg+=`<path d="${smooth(ROUTES[other].pts)}" fill="none" stroke="var(--mut)" stroke-width="3.5" stroke-dasharray="7 7" stroke-linecap="round" opacity=".65"/>`;
+  const R=ROUTES[ch];
+  R.segs.forEach((s,i)=>{const pts=R.pts.slice(s.a,s.b+1);const c=S.layers.risk?riskCol(EV[ch].segs[i].risk):'var(--blue)';svg+=`<path d="${smooth(pts)}" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round" opacity=".9"/><path d="${smooth(pts)}" fill="none" stroke="${c}" stroke-width="6" stroke-linecap="round"/>`});
+  svg+=`<path id="rt-full" d="${smooth(R.pts)}" fill="none" stroke="none"/>`;
+  svg+=`<g id="veh" transform="translate(${R.pts[0][0]},${R.pts[0][1]})"><circle r="9" fill="var(--blue)" class="pulse" opacity=".5"/><circle r="6.5" fill="var(--blue)" stroke="#fff" stroke-width="2.5"/></g></svg>`;
+  box.innerHTML=svg;
+  // cards
+  const card=(id,label)=>{const e=EV[id],r=ROUTES[id];return `<button class="rcard" data-a="pickroute" data-v="${id}" aria-pressed="${ch===id}">
+   <div class="row"><b>${label}</b><span class="mut sm">${r.n}</span><span class="sp"></span>${ai===id?`<span class="tag ok">${ic('spark',13)}${t('ai_pick')}</span>`:''}</div>
+   <div class="rgrid"><div><div class="mut sm">${t('arrive')}</div><div class="big">${fmtT(e.arrive)}</div><div class="mut sm">${fmtD(e.total)} · ${e.km} ${t('km')}</div></div>
+   <div><div class="mut sm">${t('risk')}</div><div style="margin-top:6px"><span class="tag ${riskTag(e.maxR)}">${t(riskCls(e.maxR))}</span></div><div class="bar-prog" style="margin-top:10px"><i style="width:${Math.round(e.maxR*100)}%;background:${riskCol(e.maxR)}"></i></div></div></div></button>`};
+  $('#rt-cards').innerHTML=card('A',t('fastest'))+card('B',t('safest'));
+  // alerts
+  const alerts=[];EV[ch].segs.forEach(s=>{if(s.risk>=.5)alerts.push(`<div class="alert warn">${ic('alert',20)}<span>${t('al_rain',{s:s.n})}</span></div>`)});
+  const bd=bestDep();
+  alerts.push(`<div class="alert ${alerts.length?'warn':'ok'}">${ic(alerts.length?'clock':'check',20)}<span>${alerts.length?t('al_best',{h:fmtT(bd)}):t('al_ok')}</span></div>`);
+  $('#rt-alerts').innerHTML=alerts.join('');
+  $('#rt-elev').innerHTML=elevSVG(ch,EV[ch]);
+  const km=EV[ch].km;$('#rt-prog').textContent=`${ROUTES[ch].n}: ${km} ${t('km')}, ${fmtD(EV[ch].total)}`;
+}
+function elevSVG(id,ev){
+  const W=340,H=96,E=ELEV[id],tot=E[E.length-1][0],sx=k=>10+k/tot*(W-20),sy=e=>78-e/1700*62;
+  const line=E.map((p,i)=>(i?'L':'M')+sx(p[0]).toFixed(1)+' '+sy(p[1]).toFixed(1)).join('');
+  let strip='',acc=0;ev.segs.forEach(s=>{const x1=sx(acc/ev.km*tot),x2=sx((acc+s.km)/ev.km*tot);strip+=`<rect x="${x1.toFixed(1)}" y="86" width="${(x2-x1).toFixed(1)}" height="6" rx="3" fill="${riskCol(s.risk)}"/>`;acc+=s.km});
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Elevation"><defs><linearGradient id="eg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--blue)" stop-opacity=".35"/><stop offset="1" stop-color="var(--blue)" stop-opacity="0"/></linearGradient></defs><path d="${line}L${sx(tot)} 80L${sx(0)} 80Z" fill="url(#eg)"/><path d="${line}" fill="none" stroke="var(--blue)" stroke-width="2.5" stroke-linejoin="round"/>${strip}<text x="10" y="12" font-size="11" fill="var(--mut)">120 m</text><text x="${W-10}" y="12" text-anchor="end" font-size="11" fill="var(--mut)">1,650 m</text></svg>`;
+}
+function stopDrive(silent){
+  S.driving=false;cancelAnimationFrame(S.raf);
+  const b=$('#drivebtn');if(b)b.innerHTML=`${ic('route',20)}<span>${t('start_drive')}</span>`;
+}
+function drive(){
+  if(S.driving){stopDrive();updateRoute();return}
+  const path=$('#rt-full'),veh=$('#veh');if(!path)return;
+  const ch=chosen(),R=ROUTES[ch],ev=evalRoute(R,S.dep),L=path.getTotalLength();
+  S.driving=true;$('#drivebtn').innerHTML=`${ic('x',20)}<span>${t('stop_drive')}</span>`;
+  const t0=performance.now(),dur=11000;let lastSeg=-1;
+  const cum=[];let a=0;ev.segs.forEach(s=>{a+=s.km;cum.push(a/ev.km)});
+  const step=now=>{
+    if(!S.driving)return;
+    const p=Math.min(1,(now-t0)/dur),pt=path.getPointAtLength(L*p);
+    veh.setAttribute('transform',`translate(${pt.x},${pt.y})`);
+    const si=cum.findIndex(c=>p<=c);
+    if(si!==lastSeg&&si>=0){lastSeg=si;if(ev.segs[si].risk>=.5)toast(t('al_rain',{s:ev.segs[si].n}))}
+    const kmLeft=Math.round(ev.km*(1-p)),left=ev.total*(1-p);
+    const pr=$('#rt-prog');if(pr)pr.textContent=`${kmLeft} ${t('km')} ${t('left')}, ${fmtD(left)}`;
+    if(p<1)S.raf=requestAnimationFrame(step);else{S.driving=false;toast(t('arrived')+': Gangtok');const b=$('#drivebtn');if(b)b.innerHTML=`${ic('route',20)}<span>${t('start_drive')}</span>`}
+  };
+  S.raf=requestAnimationFrame(step);
+}
+
+/* stays */
+function bkFor(type,ref){return S.bookings.find(b=>b.type===type&&b.ref===ref)}
+function statusTag(b){return b.status==='pending'?`<span class="tag warn">${ic('clock',13)}${t('waiting')}</span>`:b.status==='confirmed'?`<span class="tag ok">${ic('check',13)}${t('confirmed')}</span>`:`<span class="tag bad">${t('declined')}</span>`}
+function vStay(){
+  const mine=S.bookings.filter(b=>b.type==='stay'&&b.status==='confirmed');
+  return `<div class="row" style="margin-bottom:12px"><h2 class="disp">${t('stays_title')}</h2><span class="sp"></span><span class="tag">${t('demo_list')}</span></div>
+  ${mine.length?`<div class="sec" style="margin-top:0;margin-bottom:22px"><h3 style="margin-bottom:10px">${t('my_book')}</h3><div class="grid">${mine.map(b=>trackerCard(b,'tourist')).join('')}</div></div>`:''}
+  <div class="grid">${STAYS.map((s,i)=>{const b=bkFor('stay',s.id);return `<article class="lcard">${scene(i)}<div class="body">
+   <div class="row"><h3>${s.name}</h3><span class="sp"></span><span class="b row" style="gap:4px;color:var(--yellow)">${ic('star',16)}<span style="color:var(--ink)">${s.rate}</span></span></div>
+   <div class="row mut sm">${ic('pin',15)}${s.place}<span class="sp"></span><span class="tag ok">${ic('shield',13)}${t('verified')}</span></div>
+   <div class="chips">${s.perks.map(p=>`<span class="tag">${t(p)}</span>`).join('')}</div>
+   <div class="row sm mut">${ic('globe',15)}${s.langs.map(l=>LANGS[l]).join(', ')}</div>
+   <div class="row"><span class="price">${inr(s.price)}<span class="mut sm" style="font-weight:500">${t('per_night')}</span></span><span class="sp"></span>${b?statusTag(b):`<button class="btn sm" data-a="bookstay" data-v="${s.id}">${t('book_stay')}</button>`}</div>
+  </div></article>`}).join('')}</div>`;
+}
+function trackerPath(s){const a=[256,948],b=s.dest,mx=(a[0]+b[0])/2,my=(a[1]+b[1])/2,dx=b[0]-a[0],dy=b[1]-a[1];const c=[mx-dy*.18,my+dx*.18];return {a,b,c}}
+function bez(tp,tt){const u=1-tt;return [u*u*tp.a[0]+2*u*tt*tp.c[0]+tt*tt*tp.b[0],u*u*tp.a[1]+2*u*tt*tp.c[1]+tt*tt*tp.b[1]]}
+function trackDyn(b,view){
+  const s=STAYS.find(x=>x.id===b.ref),tp=trackerPath(s),p=b.track.prog,pos=bez(tp,p);
+  const distKm=Math.hypot(tp.b[0]-tp.a[0],tp.b[1]-tp.a[1])*KM_PX*1.35,totMin=distKm/28*60,rem=Math.round(totMin*(1-p));
+  const minx=Math.min(tp.a[0],tp.b[0],tp.c[0])-70,miny=Math.min(tp.a[1],tp.b[1],tp.c[1])-70,maxx=Math.max(tp.a[0],tp.b[0],tp.c[0])+70,maxy=Math.max(tp.a[1],tp.b[1],tp.c[1])+70;
+  const map=`<div class="mapbox"><svg viewBox="${minx} ${miny} ${maxx-minx} ${maxy-miny}" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${baseMap()}<path d="M${tp.a.join(' ')}Q${tp.c.join(' ')} ${tp.b.join(' ')}" fill="none" stroke="var(--mut)" stroke-width="3.5" stroke-dasharray="6 7" stroke-linecap="round"/><path d="M${tp.a.join(' ')}Q${tp.c.join(' ')} ${tp.b.join(' ')}" fill="none" stroke="var(--blue)" stroke-width="5" stroke-linecap="round" pathLength="1" stroke-dasharray="${p.toFixed(3)} 2"/>${pinSVG(tp.b[0],tp.b[1],'var(--green)')}<g transform="translate(${pos[0].toFixed(1)},${pos[1].toFixed(1)})"><circle r="10" fill="var(--blue)" class="pulse" opacity=".5"/><circle r="7" fill="var(--blue)" stroke="#fff" stroke-width="3"/></g></svg></div>`;
+  let txt;
+  if(b.arrived)txt=`<span class="tag ok">${ic('check',13)}${b.checked?t('checked'):t('arrived')}</span>`;
+  else if(b.track.on)txt=`<div class="row"><span class="tag warn">${ic('route',13)}${view==='host'?t('guest_way',{n:'Aarav'}):t('on_way')}</span><span class="sp"></span><span class="b">${t('arriving')} ${rem>=60?Math.floor(rem/60)+t('h')+' ':''}${rem%60}${t('m')}</span></div><div class="bar-prog"><i style="width:${Math.round(p*100)}%"></i></div>`;
+  else txt=`<span class="mut sm">${view==='host'?t('no_guest'):''}</span>`;
+  return map+`<div class="in" style="padding-bottom:0">${txt}</div>`;
+}
+function trackerCard(b,view){
+  const s=STAYS.find(x=>x.id===b.ref);
+  let btns='';
+  if(view==='tourist')btns=`<div class="row" style="flex-wrap:wrap">${!b.track.on?`<button class="btn sm" data-a="track" data-v="${b.id}">${ic('pin',18)}${t('track_me')}</button>`:''}<button class="btn sm alt" data-a="callhost" data-v="${s.id}">${ic('phone',18)}${t('call_host')}</button></div>`;
+  else if(b.arrived&&!b.checked)btns=`<button class="btn sm" data-a="checkin" data-v="${b.id}">${ic('check',18)}${t('check_in')}</button>`;
+  return `<div class="trk"><div class="in" style="padding-bottom:0"><div class="row"><h3>${s.name}</h3><span class="sp"></span><span class="tag ok">${ic('check',13)}${t('confirmed')}</span></div><div class="mut sm">${s.place}, ${s.host}</div></div>
+  <div data-trk="${b.id}" data-view="${view}">${trackDyn(b,view)}</div>
+  ${btns?`<div class="in" style="padding-top:0">${btns}</div>`:'<div style="height:12px"></div>'}</div>`;
+}
+function updateTrackers(){$$('[data-trk]').forEach(el=>{const b=S.bookings.find(x=>x.id===el.dataset.trk);if(b)el.innerHTML=trackDyn(b,el.dataset.view)})}
+
+/* guides */
+function vGuides(){
+  return `<div class="row" style="margin-bottom:12px"><h2 class="disp">${t('guides_title')}</h2><span class="sp"></span><span class="tag">${t('demo_list')}</span></div>
+  <div class="grid">${GUIDES.map(g=>{const b=bkFor('guide',g.id);return `<article class="card" style="display:grid;gap:12px;border-radius:22px 22px 22px 8px">
+   <div class="row"><div class="avatar" style="background:${g.hue}">${g.name.split(' ').map(x=>x[0]).join('')}</div><div class="sp"><h3>${g.name}</h3><div class="row sm mut" style="gap:4px"><span style="color:var(--yellow);display:flex">${ic('star',15)}</span><b style="color:var(--ink)">${g.rate}</b>&nbsp;${g.yrs} yrs</div></div></div>
+   <div class="chips">${g.sp.map(s=>`<span class="tag">${t(s)}</span>`).join('')}<span class="tag ok">${ic('shield',13)}${t('bg_check')}</span></div>
+   <div class="row sm mut">${ic('globe',15)}${t('speaks')}: ${g.langs.map(l=>LANGS[l]).join(', ')}</div>
+   <div class="row"><span class="price">${inr(g.price)}<span class="mut sm" style="font-weight:500">${t('per_day')}</span></span><span class="sp"></span>
+   <button class="btn sm alt" data-a="callguide" data-v="${g.id}">${ic('phone',18)}${t('call')}</button>${b?statusTag(b):`<button class="btn sm" data-a="bookguide" data-v="${g.id}">${t('book_guide')}</button>`}</div>
+  </article>`}).join('')}</div>`;
+}
+
+/* permits */
+function vPermits(){
+  const ready=S.areas.size&&S.agency&&S.idOk;
+  const P=S.permit;
+  const ag=AGENCIES.find(a=>a.id===S.agency);
+  return `<div class="row" style="margin-bottom:4px"><h2 class="disp">${t('permits_title')}</h2></div><p class="mut" style="margin-bottom:14px">${t('permits_sub')}</p>
+  ${P?permitStatus(P):`<div class="card" style="display:grid;gap:18px">
+   <div class="field"><span class="lab">${t('areas')}</span><div class="areas">${AREAS.map(a=>`<button class="area" data-a="area" data-v="${a.id}" aria-pressed="${S.areas.has(a.id)}"><span class="ck">${ic('check',16)}</span><span><b>${a.n}</b><br><span class="mut sm">${a.d}</span></span></button>`).join('')}</div></div>
+   <div class="two"><div class="field"><span class="lab">${t('travellers')}</span><div class="stepper"><button data-a="trav" data-v="-1" aria-label="-">−</button><b>${S.trav}</b><button data-a="trav" data-v="1" aria-label="+">+</button></div></div>
+   <div class="field"><span class="lab">${t('docs')}</span>${S.idOk?`<div class="row"><span class="tag ok">${ic('check',13)}${t('uploaded')}</span><span class="mut sm">ID_photo.jpg</span></div>`:`<button class="btn alt sm" data-a="upload">${ic('upload',18)}${t('upload_id')}</button>`}</div></div>
+   <div class="field"><span class="lab">${t('choose_agency')}</span><div style="display:grid;gap:8px">${AGENCIES.map(a=>`<button class="agency" data-a="agency" data-v="${a.id}" aria-pressed="${S.agency===a.id}"><div class="avatar" style="width:44px;height:44px;border-radius:14px 14px 14px 5px;font-size:16px;background:var(--ink);color:var(--bg)">${a.n[0]}</div><div class="sp"><b>${a.n}</b><div class="mut sm">${a.c}</div></div><span class="row sm" style="gap:3px"><span style="color:var(--yellow);display:flex">${ic('star',15)}</span>${a.rate}</span><span class="b">${inr(a.fee)}</span></button>`).join('')}</div></div>
+   <div class="note">${ic('alert',14)}${t('rules')}</div>
+   <button class="btn block" data-a="apply" ${ready?'':'disabled'}>${ic('doc',20)}${t('apply')}${ag?` (${t('fee')} ${inr(ag.fee)})`:''}</button>
+   ${ready?'':`<div class="mut sm" style="text-align:center">${t('need_more')}</div>`}
+  </div>`}`;
+}
+function qrSVG(){let r=4821,s='';const n=21;for(let y=0;y<n;y++)for(let x=0;x<n;x++){r=(r*1103515245+12345)&0x7fffffff;const fin=(x<7&&y<7)||(x>13&&y<7)||(x<7&&y>13);if(fin){const ex=x<7?x:x-14,ey=y<7?y:y-14;const on=ex===0||ex===6||ey===0||ey===6||(ex>=2&&ex<=4&&ey>=2&&ey<=4);if(on)s+=`<rect x="${x}" y="${y}" width="1" height="1"/>`}else if((r>>8)%2)s+=`<rect x="${x}" y="${y}" width="1" height="1"/>`}return `<svg class="qr" viewBox="-.5 -.5 22 22" fill="#12242D" aria-hidden="true">${s}</svg>`}
+function permitStatus(P){
+  const st=P.stage,steps=['st_docs','st_sub','st_ready'];
+  const names=[...S.areas].map(id=>AREAS.find(a=>a.id===id).n);
+  return `<div class="card"><div class="steps">${steps.map((k,i)=>`<div class="st ${st>=i?'on':''} ${st===i-1?'cur':''}"><span class="d">${st>=i?ic('check',16):''}</span>${t(k)}</div>`).join('')}</div></div>
+  ${st>=2?`<div class="pass sec" style="margin-top:16px"><div class="hd">${ic('shield',22)}<b class="disp" style="font-size:18px">HIMITRA</b><span class="sp"></span><span class="tag" style="background:rgba(255,255,255,.2);color:#fff">${t('demo_data')}</span></div>
+   <div class="strip" style="height:5px">${FL.map(c=>`<i style="background:${c}"></i>`).join('')}</div>
+   <div class="bd"><div style="display:grid;gap:8px"><div><div class="mut sm">${t('areas')}</div><b>${names.join(', ')}</b></div><div class="row" style="gap:18px;flex-wrap:wrap"><div><div class="mut sm">${t('travellers')}</div><b>${S.trav}</b></div><div><div class="mut sm">${t('valid')}</div><b>12–17 Oct</b></div><div><div class="mut sm">No.</div><b>TS-DEMO-4821</b></div></div><div class="mut sm">${AGENCIES.find(a=>a.id===S.agency).n}</div></div>${qrSVG()}</div></div>
+   <button class="btn alt sm" style="margin-top:14px" data-a="resetpermit">${t('cancel')}</button>`:''}`;
+}
+
+/* ============ views: host ============ */
+function allReqs(){
+  const bk=S.bookings.map(b=>{if(b.type==='stay'){const s=STAYS.find(x=>x.id===b.ref);return {id:b.id,who:'Aarav',what:{k:'stay',n:s.name,q:2},amt:s.price*2,status:b.status}}const g=GUIDES.find(x=>x.id===b.ref);return {id:b.id,who:'Aarav',what:{k:'guide',n:g.name,q:3},amt:g.price*3,status:b.status}});
+  return [...bk.reverse(),...S.seeds];
+}
+function vToday(){
+  const tr=S.bookings.find(b=>b.type==='stay'&&b.status==='confirmed'&&b.track.on);
+  const conf=allReqs().filter(r=>r.status==='confirmed').length;
+  return `<div class="row" style="margin-bottom:12px"><h2 class="disp">${t('nav_today')}</h2><span class="sp"></span><span class="tag ok">${ic('check',13)}${t('available')}</span></div>
+  ${S.sosSent?`<div class="alert warn" style="background:var(--bad-bg);color:var(--bad-ink);margin-bottom:14px">${ic('alert',22)}<div class="sp"><b>${t('guest_sos')}</b><div class="sm">${t('near')}, 27.30°N 88.36°E</div></div><button class="btn sm" data-a="callguest">${ic('phone',18)}${t('call')}</button></div>`:''}
+  <div class="stats"><div class="stat"><span class="mut sm">${t('guests_today')}</span><b>${2+conf}</b></div><div class="stat"><span class="mut sm">${t('earnings')}</span><b>${inr(S.earn)}</b></div><div class="stat"><span class="mut sm">${t('rating')}</span><b>4.8</b></div></div>
+  <div class="sec"><h3 style="margin-bottom:10px">${t('on_way')}</h3>
+  ${tr?trackerCard(tr,'host'):`<div class="card" style="display:grid;gap:12px;justify-items:start"><div class="mut">${t('no_guest')}</div><button class="btn sm" data-a="demoguest">${ic('user',18)}${t('demo_guest')}</button></div>`}</div>`;
+}
+function reqLine(w){return w.k==='stay'?`${w.n}, ${w.q} ${t('nights')}`:`${w.n}, ${w.q} ${t('ds')}`}
+function vRequests(){
+  const rs=allReqs(),pend=rs.filter(r=>r.status==='pending'),done=rs.filter(r=>r.status!=='pending');
+  const row=r=>`<div class="card row" style="flex-wrap:wrap"><div class="avatar" style="width:46px;height:46px;font-size:17px;background:var(--ink);color:var(--bg)">${r.who[0]}</div><div class="sp" style="min-width:150px"><b>${r.who}</b><div class="mut sm">${reqLine(r.what)}</div></div><b>${inr(r.amt)}</b>
+   ${r.status==='pending'?`<button class="btn sm alt" data-a="hdecline" data-v="${r.id}">${t('decline')}</button><button class="btn sm" data-a="haccept" data-v="${r.id}">${t('accept')}</button>`:r.status==='confirmed'?`<span class="tag ok">${t('confirmed')}</span>`:`<span class="tag bad">${t('declined')}</span>`}</div>`;
+  return `<h2 class="disp" style="margin-bottom:12px">${t('nav_requests')}</h2><div style="display:grid;gap:10px">${pend.length?pend.map(row).join(''):`<div class="card mut">${t('no_req')}</div>`}</div>
+  ${done.length?`<div class="sec"><h3 style="margin-bottom:10px">${t('handled')}</h3><div style="display:grid;gap:10px">${done.map(row).join('')}</div></div>`:''}`;
+}
+function vCalls(){
+  return `<h2 class="disp" style="margin-bottom:12px">${t('nav_calls')}</h2>
+  <div class="card" style="display:grid;gap:14px;justify-items:start"><div class="row">${ic('globe',22)}<b>${t('live_tr')}</b></div><div class="chips"><span class="chip">हिन्दी</span><span class="chip">${ic('arrow',16)}</span><span class="chip">${LANGS[S.lang]}</span></div>
+  <button class="btn" data-a="simcall">${ic('phone',20)}${t('sim_call')}</button></div>
+  <div class="sec"><h3 style="margin-bottom:10px">${t('recent')}</h3><div style="display:grid;gap:10px">${[['Meera R.','हिन्दी','4:12'],['Kabir S.','English','2:47']].map(c=>`<div class="card row"><div class="avatar" style="width:44px;height:44px;font-size:16px;background:var(--ink);color:var(--bg)">${c[0][0]}</div><div class="sp"><b>${c[0]}</b><div class="mut sm">${c[1]}</div></div><span class="mut">${c[2]}</span></div>`).join('')}</div></div>`;
+}
+
+/* ============ render ============ */
+function render(keep){
+  const y=window.scrollY;
+  document.documentElement.lang=S.lang==='ne'?'ne':S.lang;
+  chrome();
+  const m=$('#main');
+  if(S.role==='tourist'){
+    m.innerHTML=({home:vHome,route:vRoute,stay:vStay,guides:vGuides,permits:vPermits})[S.tab]();
+    if(S.tab==='home')$('#itin').innerHTML=itinerary();
+    if(S.tab==='route')updateRoute();
+  }else m.innerHTML=({today:vToday,requests:vRequests,calls:vCalls})[S.htab]();
+  window.scrollTo(0,keep?y:0);
+}
+let tT;function toast(msg){const e=$('#toast');e.textContent=msg;e.classList.add('on');clearTimeout(tT);tT=setTimeout(()=>e.classList.remove('on'),2600)}
+
+/* ============ bookings ============ */
+function bookStay(id){
+  if(bkFor('stay',id))return;const s=STAYS.find(x=>x.id===id);
+  const b={id:'b'+(++S.seq),type:'stay',ref:id,status:'pending',track:{on:false,prog:0},arrived:false,checked:false};
+  S.bookings.push(b);toast(t('req_sent'));render(true);
+  setTimeout(()=>{if(b.status==='pending'){b.status='confirmed';toast(`${s.host}: ${t('confirmed')}`);render(true)}},5500);
+}
+function bookGuide(id){
+  if(bkFor('guide',id))return;const g=GUIDES.find(x=>x.id===id);
+  const b={id:'b'+(++S.seq),type:'guide',ref:id,status:'pending',track:{on:false,prog:0}};
+  S.bookings.push(b);toast(t('req_sent'));render(true);
+  setTimeout(()=>{if(b.status==='pending'){b.status='confirmed';toast(`${g.name}: ${t('confirmed')}`);render(true)}},4500);
+}
+setInterval(()=>{
+  let ch=false,arr=false;
+  S.bookings.forEach(b=>{if(b.type==='stay'&&b.track.on&&!b.arrived){b.track.prog=Math.min(1,b.track.prog+.02);ch=true;if(b.track.prog>=1){b.arrived=true;arr=true}}});
+  if(arr){toast(t('arrived'));render(true)}else if(ch)updateTrackers();
+},900);
+
+/* ============ overlays ============ */
+const OV=$('#ov');
+function openOv(html,cls){OV.hidden=false;OV.innerHTML=`<div class="sheet ${cls||''}" role="dialog" aria-modal="true">${html}</div>`;const b=$('button',OV);if(b)b.focus()}
+function closeOv(){OV.hidden=true;OV.innerHTML=''}
+
+/* SOS */
+function openSOS(){
+  clearInterval(S.sosT);S.sos={n:5};
+  const draw=()=>{
+    const n=S.sos.n,c=2*Math.PI*76;
+    openOv(`<div style="text-align:center"><div class="row" style="justify-content:center;gap:8px">${ic('alert',22)}<h2 class="disp">${t('sos_title')}</h2></div>
+    <div class="ring"><svg viewBox="0 0 170 170"><circle cx="85" cy="85" r="76" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="10"/><circle cx="85" cy="85" r="76" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${c*(1-n/5)}" style="transition:stroke-dashoffset 1s linear"/></svg><b>${n}</b></div>
+    <p style="font-size:18px;font-weight:600">${t('sending_in')} ${n}</p>
+    <div class="row" style="justify-content:center;margin:10px 0 18px" ><span class="tag" style="background:rgba(255,255,255,.14);color:#fff">${ic('pin',13)}${t('near')}, 27.30°N 88.36°E</span></div>
+    <button class="btn block" style="background:#fff;color:#7A1414;min-height:54px;font-size:17px" data-a="soscancel">${t('cancel')}</button></div>`,'sos');
+  };
+  draw();
+  S.sosT=setInterval(()=>{S.sos.n--;if(S.sos.n<=0){clearInterval(S.sosT);sosSent()}else{const b=$('.ring b',OV);if(b){b.textContent=S.sos.n;const c=$('.ring circle:last-child',OV);c.style.strokeDashoffset=(2*Math.PI*76)*(1-S.sos.n/5);const p=$('.sheet p',OV);if(p)p.textContent=`${t('sending_in')} ${S.sos.n}`}}},1000);
+}
+function sosSent(){
+  S.sosSent=true;
+  const dist=h=>(Math.hypot(h.p[0]-ME[0],h.p[1]-ME[1])*KM_PX).toFixed(1);
+  const view=[40,340,300,300];
+  const map=`<div class="mapbox" style="height:190px;border-color:rgba(255,255,255,.2)"><svg viewBox="${view.join(' ')}" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${baseMap()}${HELP.map(h=>`<g transform="translate(${h.p[0]},${h.p[1]})"><rect x="-9" y="-9" width="18" height="18" rx="5" fill="var(--green)" stroke="#fff" stroke-width="2"/><path d="M0-5V5M-5 0H5" stroke="#fff" stroke-width="2.4"/></g>`).join('')}${pinSVG(ME[0],ME[1]-6)}</svg></div>`;
+  const contacts=['Mom','Riya','Himal Trails'];
+  openOv(`<div class="row" style="gap:12px;margin-bottom:12px"><span class="tick" style="width:36px;height:36px">${ic('check',20)}</span><h2 class="disp">${t('sos_sent')}</h2></div>
+  ${S.net?'':`<div class="alert warn" style="margin-bottom:12px">${ic('signal',20)}<span>${t('sms_fb')}</span></div>`}
+  ${map}
+  <div class="card" style="margin-top:12px"><div class="b" style="margin-bottom:4px">${t('notified')}</div>${contacts.map((c,i)=>`<div class="contact" style="animation-delay:${.5+i*.55}s"><span class="tick">${ic('check',14)}</span><span>${c}</span><span class="sp"></span><span class="mut sm">${S.net?'App':'SMS'}</span></div>`).join('')}
+   <div class="row sm mut" style="margin-top:4px">${ic('pin',15)}${t('live_loc')}</div></div>
+  <div class="card" style="margin-top:12px"><div class="b" style="margin-bottom:6px">${t('nearest')}</div>${HELP.map(h=>`<div class="row" style="padding:6px 0"><span style="color:#7FE0A8;display:flex">${ic('heart',18)}</span><span class="sp">${h.n}</span><b>${dist(h)} ${t('km')}</b></div>`).join('')}<div class="note" style="color:rgba(255,255,255,.65)">${t('demo_data')}</div></div>
+  <button class="btn block" style="margin-top:14px;background:#fff;color:#7A1414" data-a="sosclose">${t('im_safe')}</button>`,'sos');
+  if(S.role==='tourist')render(true);
+}
+
+/* Calls */
+const SCRIPT=[['g','c1'],['u','c2'],['g','c3'],['u','c4'],['g','c5']];
+function openCall(mode,who){
+  endCall(true);
+  const my=S.lang,other=mode==='tourist'?who.lang:'hi';
+  S.call={mode,who,my,other,secs:0,timers:[],i:0};
+  openOv(`<div class="callhead"><div class="avatar" style="background:${who.hue||'var(--ink)'};${who.hue?'':'color:var(--bg)'}">${who.name.split(' ').map(x=>x[0]).join('')}</div><div class="sp"><h3>${who.name}</h3><div class="sm mut" id="cstat">${t('ringing')}…</div></div><div class="wave" id="wave" hidden><i></i><i></i><i></i><i></i><i></i></div></div>
+  <div class="row" style="margin-top:12px;flex-wrap:wrap"><span class="tag ok">${ic('globe',13)}${t('live_tr')}</span><span class="chip" style="min-height:32px;padding:0 10px">${LANGS[my]}</span>${ic('arrow',16)}<span class="chip" style="min-height:32px;padding:0 10px">${LANGS[other]}</span></div>
+  <div class="caps" id="caps" aria-live="polite"></div>
+  <div id="phr"></div>
+  <button class="btn block" style="background:var(--sos);color:#fff;margin-top:8px" data-a="endcall">${ic('phone',20)}${t('end_call')}</button>`);
+  const C=S.call,at=(ms,fn)=>C.timers.push(setTimeout(fn,ms));
+  at(1400,()=>{$('#cstat').textContent=t('connected')+' 00:00';$('#wave').hidden=false;C.timers.push(setInterval(()=>{C.secs++;const e=$('#cstat');if(e)e.textContent=`${t('connected')} ${String(Math.floor(C.secs/60)).padStart(2,'0')}:${String(C.secs%60).padStart(2,'0')}`},1000))});
+  SCRIPT.forEach(([by,k],i)=>at(2000+i*2800,()=>{const isMe=mode==='tourist'?by==='u':by==='g';addBubble(isMe,k)}));
+  at(2000+SCRIPT.length*2800,()=>{if(mode==='tourist')showPhrases();else{const e=$('#wave');if(e)e.hidden=true}});
+}
+function addBubble(isMe,k){
+  const C=S.call;if(!C)return;const caps=$('#caps');if(!caps)return;
+  const pr=CALL[k][LI[C.my]],sc=CALL[k][LI[C.other]],same=C.my===C.other;
+  const speakTxt=isMe?sc:pr,speakLang=isMe?C.other:C.my;
+  caps.insertAdjacentHTML('beforeend',`<div class="bub ${isMe?'me':''}"><div class="pr">${pr}</div>${same?'':`<div class="sc"><span>${isMe?t('hears')+': ':''}${LANGS[C.other]}</span><span>${sc}</span></div>`}
+  <div class="sc" style="margin-top:2px"><button data-a="speak" data-l="${speakLang}" data-x="${encodeURIComponent(speakTxt)}" aria-label="Play">${ic('volume',18)}</button></div></div>`);
+  caps.scrollTop=caps.scrollHeight;
+}
+function showPhrases(){
+  const box=$('#phr');if(!box)return;
+  box.innerHTML=`<div class="mut sm" style="margin-bottom:6px">${t('tap_phrase')}</div><div class="chips">${['p1','p2','p3'].map((k,i)=>`<button class="chip" data-a="phrase" data-v="${i+1}">${CALL[k][LI[S.lang]]}</button>`).join('')}</div>`;
+}
+function endCall(silent){
+  const C=S.call;if(!C)return;C.timers.forEach(x=>{clearTimeout(x);clearInterval(x)});S.call=null;
+  try{speechSynthesis.cancel()}catch(e){}
+  if(!silent){closeOv();toast(t('call_end'))}
+}
+function speak(l,txt){try{const u=new SpeechSynthesisUtterance(txt);u.lang=TTSL[l];speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){}}
+
+/* ============ events ============ */
+const A={
+ role:d=>{S.role=d.v;render()},
+ tab:d=>{if(S.role==='tourist')S.tab=d.v;else S.htab=d.v;stopDrive();render()},
+ net:()=>{S.net=!S.net;render(true);toast(S.net?'Online':t('low_net'))},
+ int:d=>{S.interests.has(d.v)?S.interests.delete(d.v):S.interests.add(d.v);render(true)},
+ pace:d=>{S.pace=+d.v;render(true)},
+ budget:d=>{S.budget=+d.v;render(true)},
+ build:()=>{$('#itin').innerHTML=itinerary();$('#itin').scrollIntoView({behavior:'smooth',block:'start'})},
+ goroute:()=>{S.tab='route';render()},goguides:()=>{S.tab='guides';render()},gopermits:()=>{S.tab='permits';render()},
+ voice:()=>openCall('tourist',GUIDES[0]),
+ sos:()=>openSOS(),soscancel:()=>{clearInterval(S.sosT);closeOv()},sosclose:()=>{clearInterval(S.sosT);S.sosSent=false;closeOv()},
+ layer:d=>{S.layers[d.v]=!S.layers[d.v];render(true)},
+ pickroute:d=>{S.pick=d.v;updateRoute()},
+ drive:()=>drive(),
+ bookstay:d=>bookStay(d.v),bookguide:d=>bookGuide(d.v),
+ track:d=>{const b=S.bookings.find(x=>x.id===d.v);b.track.on=true;render(true)},
+ callhost:d=>{const s=STAYS.find(x=>x.id===d.v);openCall('tourist',{name:s.host,lang:s.hl})},
+ callguide:d=>openCall('tourist',GUIDES.find(g=>g.id===d.v)),
+ endcall:()=>endCall(),
+ speak:(d,el)=>speak(el.dataset.l,decodeURIComponent(el.dataset.x)),
+ phrase:(d,el)=>{const i=d.v;el.disabled=true;el.style.opacity=.5;addBubble(true,'p'+i);setTimeout(()=>addBubble(false,'r'+i),1500)},
+ area:d=>{S.areas.has(d.v)?S.areas.delete(d.v):S.areas.add(d.v);render(true)},
+ agency:d=>{S.agency=d.v;render(true)},
+ trav:d=>{S.trav=Math.max(1,Math.min(8,S.trav+ +d.v));render(true)},
+ upload:()=>{S.idOk=true;render(true)},
+ apply:()=>{S.permit={stage:0};render();setTimeout(()=>{S.permit&&(S.permit.stage=1,S.tab==='permits'&&render(true))},1800);setTimeout(()=>{S.permit&&(S.permit.stage=2,S.tab==='permits'&&render(true))},3800)},
+ resetpermit:()=>{S.permit=null;S.areas.clear();S.agency=null;S.idOk=false;render()},
+ haccept:d=>setReq(d.v,'confirmed'),hdecline:d=>setReq(d.v,'declined'),
+ checkin:d=>{const b=S.bookings.find(x=>x.id===d.v);b.checked=true;render(true);toast(t('checked'))},
+ demoguest:()=>{let b=S.bookings.find(x=>x.type==='stay'&&x.status==='confirmed');if(!b){b={id:'b'+(++S.seq),type:'stay',ref:'pel',status:'confirmed',track:{on:true,prog:.35},arrived:false,checked:false};S.bookings.push(b)}else{b.track.on=true}render(true)},
+ simcall:()=>openCall('host',{name:'Meera R.',hue:null}),
+ callguest:()=>openCall('host',{name:'Aarav',hue:null})
+};
+function setReq(id,st){
+  const sd=S.seeds.find(x=>x.id===id);
+  if(sd){sd.status=st;if(st==='confirmed')S.earn+=sd.amt}
+  else{const b=S.bookings.find(x=>x.id===id);if(b){b.status=st;const r=allReqs().find(x=>x.id===id);if(st==='confirmed'&&r)S.earn+=r.amt}}
+  render(true);
+}
+document.addEventListener('click',e=>{const el=e.target.closest('[data-a]');if(!el||el.disabled)return;const f=A[el.dataset.a];if(f)f(el.dataset,el,e)});
+document.addEventListener('input',e=>{const el=e.target;if(el.dataset.in==='dep'){S.dep=+el.value;updateRoute()}});
+document.addEventListener('change',e=>{const el=e.target;if(el.dataset.in==='lang'){S.lang=el.value;try{localStorage.setItem('ts_lang',S.lang)}catch(x){}const c=S.call;render(true);if(c){endCall(true);closeOv()}}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!OV.hidden&&S.call)endCall()});
+render();
+</script>
+</body>
+</html>
